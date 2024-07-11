@@ -1,0 +1,205 @@
+
+import sys
+sys.path.insert(0, '../thesis_likelihood')
+import numpy as np
+from treestruct import *
+from nodestruct import *
+from prior import *
+from buildmtrx import *
+from MCMCMoves import *
+
+"""# Hiding Linear birth death model
+
+calc from
+Estimating a Binary Character's Effect on Speciation and Extinction WAYNE P. MADDISON
+"""
+
+lambda0 = 0.7 # birth rate
+mu0 = 0.3 # death rate
+nodeStr = "2A.1B.17C.8D.9E.9F.18G." # nodes and branch lengths
+t=20 # obs time
+t2 = Tree(1)
+t2.str2tree(nodeStr,t,by='df')
+t2.disp()
+
+def lin_bd_lik(lambda0, mu0, tree):
+  cur = tree.head
+  n = len(cur.find_leaves())
+  def log_int_f(lambda0, mu0, node):
+    log_int_f.counter += 1 # track number of calls
+    tl = node.time
+    tt = node.dist_from_tip()
+    tb = tl + tt
+    d = lambda0-mu0
+
+    num = (lambda0-mu0*np.exp(-d*tt))**2
+    denom = (lambda0-mu0*np.exp(-d*tb))**2
+
+    #print("counter: ", log_int_f.counter)
+    #print(num, denom)
+    return -d*tl + np.log(num) - np.log(denom)
+  log_int_f.counter = 0
+  def recurse(lambda0, mu0, cur):
+    llik = 0
+    if cur == None:
+      return llik
+    else:
+      #print(cur.seq)
+      llik = log_int_f(lambda0, mu0, cur)
+      llik += recurse(lambda0, mu0, cur.right) + recurse(lambda0, mu0, cur.left)
+    return llik
+  llik = recurse(lambda0, mu0, cur)
+
+  plik = (n)*np.log(lambda0)+llik
+
+  d = lambda0-mu0
+  Et_root = 1 - d/(lambda0 -mu0*np.exp(-d*tree.obs_time))
+
+  num2 = np.log(np.math.factorial(n-1))
+  denom2 = np.log(lambda0*(1-Et_root)**2)
+
+  adj = plik+num2-denom2
+  # print("\t\tplik-denom", plik-denom2)
+
+  #print(num2, denom2)
+  return adj
+lin_bd_lik(lambda0, mu0, t2)
+
+lambda0 = 0.7 # birth rate
+mu0 = 0.3 # death rate
+nodeStr = "2A.1B.17C.8D.9E.9F.18G." # nodes and branch lengths
+t=20 # obs time
+t2 = Tree(1)
+t2.str2tree(nodeStr,t,by='df')
+t2.disp()
+
+def G_bd(z,x):
+  c = lambda0-mu0
+  num = np.exp(c*z)*(mu0-lambda0*np.exp(c*x))**2
+  denom = (mu0-lambda0*np.exp(c*(z+x)))**2
+  return num/denom
+
+# handles the external branches likelihood calc
+def ext_bd(t):
+  c = lambda0-mu0
+  num = np.exp(c*t)*(c**2)
+  denom = (mu0-lambda0*np.exp(c*t))**2
+  return num/denom
+
+
+def int_bd(cur):
+  if (cur.isLeaf()):
+    lik = ext_bd(cur.time)
+
+  else:
+    t_left = int_bd(cur.left)
+    t_right = int_bd(cur.right)
+    G_val = G_bd(cur.time, cur.dist_from_tip())
+
+    prod = 2*t_left*t_right
+    lik = G_val*lambda0*prod
+
+  return lik
+
+def bd_lik(tree, log=True):
+  cur = tree.head
+  # doesnt work with fractional lengths?
+  t_left = int_bd(cur.left)
+  t_right = int_bd(cur.right)
+  G_val = np.array(G_bd(cur.time,cur.dist_from_tip()))
+  alpha = 1
+  prod = 2*t_left*t_right
+  val = G_val*lambda0*prod
+  if log:
+    val = np.log(val)
+  return val
+
+p1 = ext_bd(9)*ext_bd(9)*ext_bd(17)*ext_bd(18)
+print(ext_bd(9))
+print(ext_bd(17))
+print(ext_bd(18))
+
+p2 = G_bd(8,9)*G_bd(1,17)*G_bd(2,18)
+print(np.log(p1*p2*(2*lambda0)**3))
+
+plot = 0
+alpha = [0.5,0.5]
+mu0 = mu1 = 0.3
+lambda0 = lambda1 = 0.7
+q10 = q01 = 0
+
+d, D0, D1, B = build_mtrx(mu0, mu1, q01, q10, lambda0, lambda1)
+print(bd_lik(t2))
+lik = tree_prior(t2, alpha, d, D0, B)
+print(lik)
+
+
+
+nodeStr = "2A.1B.17C.8D.9E.9F.18G." # nodes and branch lengths
+t=20 # obs time
+trees= []
+trees.append(Tree(1))
+trees[0].str2tree(nodeStr,t,by='df')
+trees[0].disp()
+
+mystr = "(4 / 'T'(2 / 'G'(5 / 'A')(5 / 'T'))(7 / 'C'))"
+t2 = Tree(1)
+t2.str2tree(mystr,4+7, by='io')
+trees.append(t2)
+t2.disp()
+
+nodeStr = "2T.3G.5A.5T.7C.1A.1T" # nodes and branch lengths
+t2 = Tree(1)
+t2.str2tree(nodeStr,10,by='df')
+trees.append(t2)
+t2.disp()
+
+nodeStr = "2T.5G.5A" # nodes and branch lengths
+t2 = Tree(1)
+t2.str2tree(nodeStr,7,by='df')
+trees.append(t2)
+t2.disp()
+
+for tree in trees:
+  a = bd_lik( tree)
+  b = tree_prior(tree, alpha, d, D0, B)
+  print("lin bd llik: ", a)
+  print("MBT llik: ", b)
+  print("\tratio", a/b)
+  print("\tdifference", a-b)
+
+nodeStr = "2A.1T.17C.8G.9G.9T.18A." # nodes and branch lengths
+t=20 # obs time
+trees= []
+t2=Tree(1)
+t2.str2tree(nodeStr,t,by='df')
+t2.disp()
+
+t_current = t2
+t_new= q_ratio = -1
+for i in range(20):
+  move = propose_move(t_current,alpha, d, D0, B, i)
+
+  if move != EXIT_FAILURE:
+    t_new, q_ratio, alpha, d, D0, B = move
+    trees.append(t_new)
+print(len(trees))
+
+l1 = []
+l2 = []
+for i in range(len(trees)):
+  print(i)
+  tree = trees[i]
+  tree.disp()
+  a = lin_bd_lik(lambda0, mu0, tree)
+  b = tree_prior(tree, alpha, d, D0, B)
+  l1.append((i, a))
+  l2.append((i,b))
+
+c = sorted(l1, key=lambda x: x[1])
+
+f = sorted(l2, key=lambda x: x[1])
+
+print(c)
+print(f)
+# the order of conclusions are the same, my model works!!!
