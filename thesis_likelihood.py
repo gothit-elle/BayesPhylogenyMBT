@@ -15,9 +15,7 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-import warnings
-from tqdm.notebook import tqdm
-warnings.filterwarnings("error")
+
 
 
 from tree import tree
@@ -49,29 +47,6 @@ trees= []
 t2=Tree(1)
 t2.str2tree(nodeStr,t,by='df')
 t2.disp()
-
-t_current = t2
-t_new= q_ratio = -1
-for i in range(20):
-  move = propose_move(t_current,alpha, d, D0, B, i)
-
-  if move != EXIT_FAILURE:
-    t_new, q_ratio, alpha, d, D0, B = move
-    trees.append(t_new)
-
-"""# MCMC chain"""
-
-plot=0
-treestrings = []
-for tree in trees:
-  treestrings.append(tree.toStr())
-treestrings = list(set(treestrings))
-for i in treestrings:
-  s = i
-  t_cur = Tree(1)
-  t_cur.str2tree(s,t,by='io')
-  t_cur.disp()
-  print(i)
 
 
 

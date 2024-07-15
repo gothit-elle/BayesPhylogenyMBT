@@ -21,7 +21,13 @@ class node:
 
   def __repr__(self):
     return '<tree rep>'
-
+	
+  def is_neg(self):
+    if self == None:
+      return False
+    if self.time <= 0 or (self.right != None and self.right.is_neg()) or (self.left != None and self.left.is_neg()):
+      return True
+	  
   def isLeaf(self):
     if (self.left == None) and (self.right==None):
       return True
@@ -62,6 +68,7 @@ class node:
       dist += cur.parent.time
       cur = cur.parent
     return dist
+
   def scale_parents(self, delta, obs_time):
     if self.isLeaf():
       dist = self.dist_from_root()
@@ -139,4 +146,4 @@ class node:
         cur = cur.parent
       dists.append((dist, leaf.time))
     return dists
-	
+  

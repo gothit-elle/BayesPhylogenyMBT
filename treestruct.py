@@ -10,8 +10,8 @@ class Tree:
     self.seq_len = seq_len
     self.obs_time = None
 
-  def disp(self):
-    print(self.head)
+  def disp(self, log=False, fname=None):
+    print(self.head, file = fname)
 
   def toStr(self):
     #convert tree to string

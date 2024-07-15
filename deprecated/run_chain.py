@@ -11,7 +11,7 @@ import random
 
 
 
-random.seed(26111994)
+# random.seed(26111994)
 
 # we start a tree
 # relative rates matrix
@@ -26,7 +26,7 @@ Q1 = R@np.diag(Pi)
 # need to adjust so rows sum to 0
 Q1 -= np.diag(Q1@np.ones(4))
 
-N = 1500
+N = 500
 
 debug = 0
 

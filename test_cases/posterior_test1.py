@@ -31,6 +31,7 @@ trees= []
 trees.append(Tree(1))
 trees[0].str2tree(nodeStr,t,by='df')
 trees[0].disp()
+
 mystr = "(4 / 'T'(2 / 'G'(5 / 'A')(5 / 'T'))(7 / 'C'))"
 t2 = Tree(1)
 t2.str2tree(mystr,4+7, by='io')

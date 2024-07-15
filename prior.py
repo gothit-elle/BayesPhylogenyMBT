@@ -19,11 +19,12 @@ def get_E(end, alpha, d, D0, B, plot=0):
     # @constrain([0, 1]) # limits growth at end points. doesnt impact unless t is big
     def E_sol(t, E):
       # we need this loop, otherwise in big time steps E(t) might be > 1
+      E = np.array(E).astype(object)
       for i in range(len(E)):
         if E[i] > 1:
           E[i] = 1 # hack-y solution to do this
       dE = d + D0@E + B@np.kron(E, E)
-      return dE
+      return dE.astype(object)
 
     stateE0 = np.array([0,0]) # E(0) = 0 initial cond
     if plot:
@@ -49,7 +50,7 @@ def G_bkxk(z,x, alpha, d, D0, B, plot=0):
     #dG = D0@G + B@(np.kron(E,G.astype(np.float64)).astype(object) + np.kron(G.astype(np.float64), E).astype(object))
     p1 = np.kron(E,G) + np.kron(G,E)
     dG = D0@G + B@(p1)
-    dG = dG.astype(np.float64).ravel()
+    dG = dG.astype(object).ravel()
     return dG
 
   state0 = np.identity(2).ravel()#initially the identity
@@ -109,7 +110,7 @@ def ext_f(bm_hat, alpha, d, D0, B):
     # our ODEs
     dE = d + D0@E + B@(np.kron(E, E).astype(object))
     dD_1 = D0@D_1 + B@(np.kron(E, D_1).astype(object) + np.kron(D_1, E).astype(object))
-    return np.concatenate((dE, dD_1)).astype(np.float64)
+    return np.concatenate((dE, dD_1)).astype(object)
 
   state0 = np.array([0,0, 1,1]) # E(0) = 0, D_1 = 1 initial conds
   #times = np.linspace(0,bm_hat)
@@ -128,12 +129,12 @@ def int_f(cur, alpha, d, D0, B):
     G_val = np.array(G_bkxk(cur.time, cur.dist_from_tip(), alpha, d, D0, B)).astype(object)
 
     prod = np.kron(t_left, t_right).astype(object) + np.kron(t_right, t_left).astype(object)
-    lik = G_val@B@(prod)
+    lik = G_val@B@prod
 
   return np.array(lik).astype(object)
 
 
-def tree_prior(tree, alpha, d, D0, B, log=True):
+def tree_prior(tree, alpha, d, D0, B, log=True, fname = None):
   cur = tree.head
   # doesnt work with fractional lengths?
   t_left = int_f(cur.left, alpha, d, D0, B)
@@ -145,8 +146,9 @@ def tree_prior(tree, alpha, d, D0, B, log=True):
   try:
     if log:
       val = np.log(val)
-  except RuntimeWarning:
-    tree.disp()
-    print(alpha, d, D0, B)
+  except RuntimeWarning as rw:
+    print("\n", rw, "val=", val)
+    tree.disp(log, fname = fname)
+    print(tree.toStr(), alpha, d, D0, B, file = fname)
     val = 1 # impossible as probs are < 1
   return val

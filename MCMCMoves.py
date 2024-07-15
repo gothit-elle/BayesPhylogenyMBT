@@ -10,6 +10,10 @@ debug = 0
 BETA = 1.2 # from paper [2]
 theta = 1
 theta = 1/theta
+WINDOW_ALPHA = 0.1
+WINDOW_D0 = 0.1
+WINDOW_B = 0.1
+WINDOW_MU = 0.1
 
 
 def find_node_n(cur, call, pick_node):
@@ -45,10 +49,11 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
     print(move_type)
     warnings.warn("Warning: theta set arbitrarily and not tied to parameters")
     warnings.warn("Warning: nodes are a fixed choice here")
-
+  num_nodes = len(tcpy.toStr().split('(')) - 1
+  
   if move_type == 0: # scaling move TODO: test
     delta = np.random.uniform(1/BETA, BETA)
-    Q = 1/delta**(step-3)
+    Q = 1/delta**(num_nodes-3) # this might need to be a -2 since we care about the scale of the root here
 
     if debug: print(delta,  tcpy.obs_time)
     tcpy.head.scale_parents(delta,  tcpy.obs_time) # scale all the internal nodes
@@ -60,7 +65,6 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
 
   elif move_type == 1: # WB move
 
-    num_nodes = len(tcpy.toStr().split('(')) - 1
     n_i = np.random.choice(num_nodes) + 1
     n_j = np.random.choice(num_nodes) + 1
     if debug:
@@ -74,12 +78,16 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
 
     ip = i.parent
     jp = j.parent
-
+    
     if (jp != None and jp.dist_from_tip() <= i.dist_from_tip()) or (i == j) or (ip == j) or (ip == jp) or (ip == None):
       return EXIT_FAILURE
     else:
       ipp = i.parent.parent
       replace_root2 = (ipp == None)
+      idft = i.dist_from_tip()
+      jdft = j.dist_from_tip()
+      
+      ipdft = ip.dist_from_tip()
 
 
       if ip.left == i:
@@ -111,6 +119,7 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
         replace_root2 = True
 
       if jp != None:
+        jpdft = jp.dist_from_tip()
         if debug: print("ip is", ip)
         if jp.left == j:
           jp.left = ip
@@ -139,9 +148,10 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
 
         tcpy.head.time += delta
       else:
-        new_dist = np.random.uniform(max(i.dist_from_tip(), j.dist_from_tip()), jp.dist_from_tip())
-        extend_branch_by = ip.dist_from_tip() - new_dist
+        new_dist = np.random.uniform(max(idft, jdft), jpdft)
+        extend_branch_by = ipdft - new_dist
         ip.time += extend_branch_by
+
       if debug:
         print("tcpy is, before fixing:")
         tcpy.disp()
@@ -151,7 +161,6 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
 
 
   elif move_type==2: # Subtree Exchange
-    num_nodes = len(tcpy.toStr().split('(')) - 1
     n_i = np.random.choice(num_nodes) + 1
     # warnings.warn("Warning: nodes are a fixed choice here")
     # n_i = 3
@@ -184,7 +193,6 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
     # this also has the most bugs. why
 
     # pick an internal node
-    num_nodes = len(tcpy.toStr().split('(')) - 1
     n_i = np.random.choice(num_nodes) + 1
     if debug: n_i = 1
     i = find_node_n(cur, 0, n_i)
@@ -249,8 +257,9 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
         if j.time == float('inf'):
           return EXIT_FAILURE
 
-
       if debug: print(i.time)
+      if i.time < 0:
+          return EXIT_FAILURE
       tcpy.fix_tree()
     else:
       return EXIT_FAILURE
@@ -260,10 +269,6 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
   elif move_type==4: # Random walk
     if debug: print("rates changed step", step )
     Q = 1 # symmetric
-    WINDOW_ALPHA = 0.1
-    WINDOW_D0 = 0.1
-    WINDOW_B = 0.1
-    WINDOW_MU = 0.1
     def alter_rates(WINDOW_SIZE, vector, normalise=False):
       for i in range(len(vector)):
         delta = np.random.uniform(-WINDOW_SIZE, WINDOW_SIZE)
@@ -305,11 +310,14 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
     temp = D0_cpy@np.ones(len(B)) + D1_cpy@np.ones(len(B))+d_cpy
     np.testing.assert_allclose(np.array(temp).astype(np.float64), 0, atol=1e-7)
 
+  if tcpy.head.is_neg():
+    return EXIT_FAILURE
   return tcpy, Q, alpha_cpy, d_cpy, D0_cpy, B_cpy
   
   
 should_break = 0
-def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io'):
+def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1):
+  log = 1
 
   chain1a = []
   chain1b = []
@@ -317,8 +325,9 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io'):
 
   t_cur = Tree(1)
   t_cur.str2tree(s,t,by=by)
-  t_cur.disp()
+  t_cur.disp(log, fname)
   p1 = tree_posterior(t_cur, alpha, d, D0, B, Q1, Pi)
+  print(p1, file=fname)
 
 
   chain1a.append(t_cur.toStr())
@@ -326,7 +335,7 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io'):
   chain1c.append((dcpy(alpha), dcpy(d), dcpy(D0), dcpy(B)))
 
   successes = 0
-  for i in tqdm(range(N)):
+  for i in tqdm(range(N), position = pos):
     move = propose_move(t_cur, alpha, d, D0, B, i)
     p1 = chain1b[-1]
     if move != EXIT_FAILURE:
@@ -335,11 +344,12 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io'):
       # p1 = tree_posterior(t_cur, alpha, d, D0, B, Q1) # i dont need this right?
       if debug: print("operating on: ")
       if debug: t_new.disp()
-      p_new = tree_posterior(t_new, alpha_new, d_new, D0_new, B_new, Q1, Pi)
+      p_new = tree_posterior(t_new, alpha_new, d_new, D0_new, B_new, Q1, Pi, log, fname)
+      
       if p_new == 1:
-        print("prev tree was: ")
-        t_cur.disp()
-        print(alpha, d, D0, B)
+        print("prev tree was: ", file=fname)
+        t_cur.disp(log, fname=fname)
+        print(alpha, d, D0, B, file = fname)
         if should_break:
           break
         else:
@@ -349,9 +359,9 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io'):
           d_new = d
           D0_new = D0
           B_new = B
-      if debug: print("q_ratio is: ", q_ratio)
-      acc_ratio = min(q_ratio*p1/p_new, 1)
-
+      #print("q, p1, p2, ratio: ", q_ratio, p1, p_new, np.exp(p1 - p_new), file=fname)
+      acc_ratio = min(np.exp(np.log(q_ratio) +p_new - p1) , 1)
+      #print("acc_ratio is: ", acc_ratio, file=fname)
       if np.random.uniform(0,1) < acc_ratio: # accept the move
         successes += 1
         if debug: print("acc at ", i, acc_ratio)

@@ -1,6 +1,7 @@
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
+from treestruct import *
 
 chaina = []
 chainb = []
@@ -24,7 +25,15 @@ for i in range(4):
 		data = list(reader)
 	chainc += data
 
-print(chainb[0])
+for i in range(4):
+	lst = chainb[i]
+	ind = np.argmax(lst)
+	s = chaina[i][ind]
+	t_cur = Tree(1)
+	t_cur.str2tree(s,20,by='io')
+	t_cur.disp()
+	print("lik is: ", chainb[i][ind])
+	
 N = len(chainb[0])
 plt.plot(range(N), chainb[0], range(N), chainb[1], range(N), chainb[2], range(N), chainb[3])
 params = {'mathtext.default': 'regular' }
