@@ -52,18 +52,19 @@ class Tree:
       # convert string to tree (in order traversal)
       seq = re.search("[A-Z]+",nodeStr).group()
       time= re.search("\d+[.]?\d*",nodeStr).group()
-      if "N" in seq:
-        seq = None
+      #if "N" in seq:
+      #  seq = None
       new_node = node(seq, None, float(time))
       cur = new_node
-      skip = len(seq)+len(time)
+      self.seq_len = len(seq)
+      skip = self.seq_len+len(time)
       for i in range(skip,len(nodeStr)):
         elem = nodeStr[i]
         if elem == "(": # create child node
           time= float(re.search("\d+[.]?\d*",nodeStr[i:]).group())
           seq = re.search("[A-Z]+",nodeStr[i:]).group()
-          if "N" in seq:
-            seq = None
+          # if "N" in seq:
+          #  seq = None
           if type(cur.left) != type(node(None, None, 0)):
             cur.left = node(seq, cur, time)
             cur = cur.left
@@ -81,11 +82,11 @@ class Tree:
 
       time= float(re.search("\d+[.]?\d*",elems[0]).group())
       seq = re.search("[A-Z]+",elems[0]).group()
-      if "N" in seq:
-        seq = None
+      #if "N" in seq:
+      #  seq = None
       new_node = node(seq, None, time)
       cur = new_node
-
+      self.seq_len = len(seq)
       time_tracker = time
 
       for i in range(len(elems[1:])):
@@ -94,8 +95,8 @@ class Tree:
 
         time= float(re.search("\d+[.]?\d*",elem).group())
         seq = re.search("[A-Z]+",elem).group()
-        if "N" in seq:
-            seq = None
+        # if "N" in seq:
+        #    seq = None
         # print(time, seq)
 
         # print("timetracker is", time_tracker)

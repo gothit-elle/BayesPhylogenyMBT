@@ -15,17 +15,19 @@ def prob(Q, sk, si, t): #sk, si, vi):
 
 def cond_likelihood(tree, P, index, Pi, debug=False):
   # calculates the likelihood of a tree given data (embedded in the struct)
-
   cur=tree
 
   if cur.isLeaf(): # if leaf return obs
+    if debug: print("leaf at", cur.seq, index)
     cur.lik = cur.base2int(index)
+    if cur.lik == -1:
+      cur.lik = Pi
   else:
     # otherwise we want to sum across the leaves
     if (cur.right is not None):
-      cur.right.lik = cond_likelihood(cur.right, P, index, debug)
+      cur.right.lik = cond_likelihood(cur.right, P, index, Pi, debug)
     if (cur.left is not None):
-      cur.left.lik = cond_likelihood(cur.left, P, index, debug)
+      cur.left.lik = cond_likelihood(cur.left, P, index, Pi, debug)
     # we have the likelihoods.
     # pick a base:
     L = []
@@ -46,6 +48,7 @@ def log_lik(new_tree, P, Pi, debug=False):
   # returns the loglik of the tree
   new_tree.lik = 0
   seq_len = new_tree.seq_len
+  if debug: print('seq len is', seq_len)
   for k in range(seq_len):
     new_tree.lik += np.log(sum([i*j for (i,j) in zip(Pi,cond_likelihood(new_tree.head, P, k, Pi, debug))]))
   return new_tree.lik

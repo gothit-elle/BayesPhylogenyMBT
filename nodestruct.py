@@ -103,6 +103,8 @@ class node:
     return min_dist
 
   def base2int(self,index):
+    if self.seq[index] == "N":
+      return -1
     return [int(self.seq[index]==char) for char in BASES]
 
   def toStr(self):

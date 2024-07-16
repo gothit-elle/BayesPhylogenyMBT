@@ -7,6 +7,7 @@ from nodestruct import *
 from likelihood import *
 from buildmtrx import *
 
+debug = False
 # relative rates matrix
 R = np.array([0, 0.5, 2, 0.5,
               0.5, 0, 0.5, 2,
@@ -28,15 +29,15 @@ d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1
 
 new_tree = Tree(1)
 new_tree.head = node("T", None, 0.1)
-new_tree.head.right = node("C", new_tree.head, 1.2)
-new_tree.head.left = node("G", new_tree.head, 0.2)
+new_tree.head.right = node("N", new_tree.head, 1.2)
+new_tree.head.left = node("N", new_tree.head, 0.2)
 new_tree.head.left.right = node("T", new_tree.head.left, 0.5)
 new_tree.head.left.left = node("A", new_tree.head.left, 1)
 new_tree.head.left.right.right = node("T", new_tree.head.left, 0.5)
 new_tree.head.left.right.left = node("T", new_tree.head.left, 0.5)
 new_tree.disp()
 
-print("tree likelihood is: ", log_lik(new_tree, Q1, Pi, True))
+print("tree likelihood is: ", log_lik(new_tree, Q1, Pi, debug))
 
 """# Testing displays, likelihood"""
 
@@ -48,9 +49,11 @@ print(new_tree.toStr())
 t2.str2tree(new_tree.toStr(), by='io')
 t2.disp()
 
-nodeStr = "2T.1G.17A.8T.9T.9T.18C."
+# longer seqs test
+nodeStr = "2TAT.1TTG.17AAC.8GTG.9TAC.9TAA.18CAT."
 # enter time
 t=20
 t2 = Tree(1)
 t2.str2tree(nodeStr,t,by='df')
 t2.disp()
+print("tree likelihood is: ", log_lik(t2, Q1, Pi, debug))
