@@ -9,14 +9,23 @@ class node:
     self.parent = parent
     self.time = time
     self.lik = None
+    self.map = None
 
   def __str__(self, level=0):
     #ret = "\t"*level+"time: " + repr(self.time)+' / '+repr(self.seq)+"\n" # original
-    ret = repr(round(self.time,2)) + ' ~ ' + repr(self.seq)+ ' ~ ' +repr(round(self.dist_from_tip(),2)) +"\n"
+    if self.map != None:
+      mid_val = self.map
+    else:
+      mid_val = self.seq
+    ret = repr(round(self.time,2)) + ' ~ ' + repr(mid_val)+ ' ~ ' +repr(round(self.dist_from_tip(),2)) +"\n"
+    if level != 0:
+      ex = ' '*round((level+1)*1.8 + 0.9)
+    else:
+      ex = ''
     if (self.right is not None):
-      ret += "\t"*(level+1) + "├──" + self.right.__str__(level+1)
+      ret += "\t"*(level+1) + ex + "├──" + self.right.__str__(level+1)
     if (self.left is not None):
-      ret += "\t"*(level+1)+ "└──" + self.left.__str__(level+1)
+      ret += "\t"*(level+1)+ ex +"└──" + self.left.__str__(level+1)
     return ret
 
   def __repr__(self):
@@ -114,6 +123,8 @@ class node:
       ret += "("
       #ret += repr(self.time)+' / '+repr(self.seq)
       ret += repr(self.time)+' / '+repr(self.seq)
+      if self.map is not None:
+        ret += ' + ' + repr(self.map)
       if not self.isLeaf():
         ret += self.left.toStr()
       if not self.isLeaf():
