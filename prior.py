@@ -11,6 +11,7 @@ from scipy.integrate import odeint, solve_ivp
 import matplotlib.pyplot as plt
 import re
 import warnings
+
 warnings.filterwarnings("error")
 
 toler = 1e-7
@@ -129,7 +130,7 @@ def int_f(cur, alpha, d, D0, B):
     G_val = np.array(G_bkxk(cur.time, cur.dist_from_tip(), alpha, d, D0, B)).astype(object)
 
     prod = np.kron(t_left, t_right).astype(object) + np.kron(t_right, t_left).astype(object)
-    lik = G_val@B@prod
+    lik = G_val@B@(prod)
 
   return np.array(lik).astype(object)
 

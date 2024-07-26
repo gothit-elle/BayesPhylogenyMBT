@@ -40,15 +40,26 @@ def cond_likelihood(tree, P, index, Pi, debug=False):
           right += prob(P, base2int(sk), base2int(si), cur.left.time)*cur.left.lik[j]
       L.append(left*right)
     cur.lik = L
-  if debug: print(cur.seq, cur.time, cur.lik)
+  if debug: print("printing...", cur.seq, cur.time, cur.lik)
   return cur.lik
 
+from multiprocessing import Pool, freeze_support, cpu_count
+from itertools import repeat
 
+def sub_lik(k, new_tree, P, Pi, debug=False):
+  return np.log(sum([i*j for (i,j) in zip(Pi,cond_likelihood(new_tree.head, P, k, Pi, debug))]))
+  
 def log_lik(new_tree, P, Pi, debug=False):
   # returns the loglik of the tree
   new_tree.lik = 0
   seq_len = new_tree.seq_len
   if debug: print('seq len is', seq_len)
-  for k in range(seq_len):
-    new_tree.lik += np.log(sum([i*j for (i,j) in zip(Pi,cond_likelihood(new_tree.head, P, k, Pi, debug))]))
+
+  if __name__ == 'likelihood':
+    pool = Pool(processes=11)
+    results = pool.starmap(sub_lik, zip(range(seq_len), repeat(new_tree), repeat(P), repeat(Pi), repeat(debug)))
+    pool.close()
+  #for k in range(seq_len):
+  #  new_tree.lik += sub_lik(k)
+  new_tree.lik = sum(results)
   return new_tree.lik

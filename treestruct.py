@@ -63,6 +63,8 @@ class Tree:
         if elem == "(": # create child node
           time= float(re.search("\d+[.]?\d*",nodeStr[i:]).group())
           seq = re.search("[A-Z]+",nodeStr[i:]).group()
+          if len(seq) > self.seq_len:
+            self.seq_len = len(seq)
           mapping = re.search("[A-Z]+[^\d]*(?!='\(|'\))",nodeStr[i:]).group().strip("'()").split("' + '")
           if len(mapping) == 2: 
             map = mapping[1]
@@ -92,7 +94,6 @@ class Tree:
       #if "N" in seq:
       #  seq = None
       new_node = node(seq, None, time)
-      new_node.map = map
       cur = new_node
       self.seq_len = len(seq)
       time_tracker = time

@@ -87,6 +87,25 @@ class node:
       self.right.scale_parents(delta, obs_time)
       self.left.scale_parents(delta, obs_time)
 
+  def can_prune(self):
+    for leaf in self.find_leaves():
+      if leaf.seq == 'F':
+        return True
+    return False
+	
+  def prune_tree(self):
+    leaves= self.find_leaves()
+    while self.can_prune():
+      for leaf in leaves: 
+        if leaf.seq == 'F':
+          if leaf.parent == None:
+            leaf.seq = "Failed"
+          elif leaf.parent.right == leaf:
+            leaf.parent.right = None
+          else:
+            leaf.parent.left = None
+
+			
   def find_max_dist(self):
     d1= 0
     d2= 0
@@ -145,7 +164,13 @@ class node:
     leaves = []
     if cur.isLeaf():
       return [cur]
-    leaves += cur.right.find_leaves() + cur.left.find_leaves()
+    l_r = []
+    if cur.right != None:
+      l_r = cur.right.find_leaves()
+    l_l = []
+    if cur.left != None:
+      l_l = cur.left.find_leaves()
+    leaves += l_r + l_l
     return leaves
 
   def find_leaf_dists(self):

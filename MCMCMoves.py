@@ -314,7 +314,7 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
     return EXIT_FAILURE
   return tcpy, Q, alpha_cpy, d_cpy, D0_cpy, B_cpy
   
-  
+from decimal import *
 should_break = 0
 def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1):
   log = 1
@@ -360,7 +360,8 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1):
           D0_new = D0
           B_new = B
       #print("q, p1, p2, ratio: ", q_ratio, p1, p_new, np.exp(p1 - p_new), file=fname)
-      acc_ratio = min(np.exp(np.log(q_ratio) +p_new - p1) , 1)
+      internal = Decimal(np.log(q_ratio) +p_new - p1)
+      acc_ratio = min(np.exp(internal) , 1)
       #print("acc_ratio is: ", acc_ratio, file=fname)
       if np.random.uniform(0,1) < acc_ratio: # accept the move
         successes += 1
