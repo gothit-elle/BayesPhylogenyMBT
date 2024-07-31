@@ -1,7 +1,7 @@
 import numpy as np
 from nodestruct import *
 from treestruct import *
-from buildmtrx import *
+
 import random
 import sys
 from MCMCMoves import *
@@ -102,7 +102,7 @@ def sim_MBT(alpha, D0, d, B, cur, time, stopping_time):
 	t = -1/loss * np.log(u) # an event happens
 	cur.time += t
 	if time + t> stopping_time: # force stop
-		print("reached obs time", time, t)
+		# print("reached obs time", time, t)
 		cur.time = stopping_time - cur.dist_from_root()
 		return cur
 	# the branch keeps living until it dies. so we dont care about length
@@ -111,7 +111,7 @@ def sim_MBT(alpha, D0, d, B, cur, time, stopping_time):
 	
 	res = event(D0/loss, u, state, True, 0)
 	if res[0] == True: # a transition occurred
-		print("t occ")
+		# print("t occ")
 		state = res[1] # now exist in this state
 		state_new = [0]*len(alpha)
 		state_new[state] = 1
@@ -120,7 +120,7 @@ def sim_MBT(alpha, D0, d, B, cur, time, stopping_time):
 	elif res[0] == False: # no transition occurred. try a different event
 		res = event_d(d/loss, u, state, res[1])
 		if res[0] == True: # a death occurred
-			print("d occ")
+			# print("d occ")
 			cur.seq = 'F'
 			return cur # return as is
 		elif res[0] == False:
@@ -134,7 +134,7 @@ def sim_MBT(alpha, D0, d, B, cur, time, stopping_time):
 			state_r = [0]*len(alpha)
 			# new parent phase
 			state_r[states[1]] = 1
-			print("b occ")
+			# print("b occ")
 			# a birth must have occurred.
 			# get new states
 			cur.left = node('N', cur, 0)
@@ -173,15 +173,14 @@ def sim_tree(alpha, D0, d, B, Q1, Pi, time, debug = False):
 	t2.head = clean_tree(t2.head)
 	if debug: t2.disp()
 	t2.head = sim_evo(t2.head, Q1, Pi)
+	t2.head.map_leaves()
 	return t2
 
-def target(s):
+def target(s, N, t, Q1, alpha, d, D0, B, Pi, i, pos):
 	with open('../thesis_likelihood\logs\logr.txt', "w", encoding="utf-8") as f:
-		successes, chaina, chainb, chainc = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=1)
+		successes, chaina, chainb, chainc = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos)
 
 	print("acceptance rate", successes/len(chaina))
-
-	i = 7
 	with open(f"../thesis_likelihood\csv\c{i+1}a.csv", 'w', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
 		my_writer.writerow(chaina)
@@ -195,38 +194,3 @@ def target(s):
 		my_writer.writerow(chainc)
 		
 
-def main():
-	time = 5
-	alpha = np.array([0.5,0.5]).astype(object)
-	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
-
-	
-	# we start a tree
-	# relative rates matrix
-	R = np.array([0, 0.5, 2, 0.5,
-				  0.5, 0, 0.5, 2,
-				  2, 0.5, 0, 0.5,
-				  0.5, 2, 0.5, 0]).reshape(4,4)
-	# initial distribution
-	Pi = [0.295, 0.205, 0.205, 0.295]
-	# rate matrix
-	Q1 = R@np.diag(Pi)
-	# need to adjust so rows sum to 0
-	Q1 -= np.diag(Q1@np.ones(4))
-	
-	t2 = sim_tree(alpha, D0, d, B, Q1, Pi, time)
-	t2.obs_time = time
-	t2.disp()
-	return t2, Q1, Pi, alpha, d, D0, D1, B
-
-
-from multiprocessing import freeze_support
-if __name__ == '__main__':
-	random.seed(26111994)
-	t2, Q1, Pi, alpha, d, D0, D1, B = main()
-	freeze_support()
-	N = 1000
-	t = t2.obs_time
-	str = t2.toStr()
-	#print('lik is', log_lik(t2, Q1, Pi, False))
-	target(str)

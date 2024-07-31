@@ -49,16 +49,20 @@ from itertools import repeat
 def sub_lik(k, new_tree, P, Pi, debug=False):
   return np.log(sum([i*j for (i,j) in zip(Pi,cond_likelihood(new_tree.head, P, k, Pi, debug))]))
   
-def log_lik(new_tree, P, Pi, debug=False):
+def log_lik(new_tree, P, Pi, debug=False, multip=False):
   # returns the loglik of the tree
   new_tree.lik = 0
   seq_len = new_tree.seq_len
   if debug: print('seq len is', seq_len)
-
-  if __name__ == 'likelihood':
-    pool = Pool(processes=11)
-    results = pool.starmap(sub_lik, zip(range(seq_len), repeat(new_tree), repeat(P), repeat(Pi), repeat(debug)))
-    pool.close()
+  if multip:
+    if __name__ == 'likelihood':
+      pool = Pool()
+      results = pool.starmap(sub_lik, zip(range(seq_len), repeat(new_tree), repeat(P), repeat(Pi), repeat(debug)))
+      pool.close()
+  else: 
+    results = []
+    for k in range(seq_len):
+      results.append(sub_lik(k, new_tree, P, Pi, debug))
   #for k in range(seq_len):
   #  new_tree.lik += sub_lik(k)
   new_tree.lik = sum(results)

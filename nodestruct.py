@@ -1,3 +1,4 @@
+from num2words import num2words
 BASES = ["A","C", "G", "T"]
 # Tree data struct
 
@@ -150,6 +151,34 @@ class node:
         ret += self.right.toStr()
       ret += ")"
     return ret
+	
+	
+# two functions below copied from https://stackoverflow.com/a/61123048
+
+
+  def traverse(self, newick):
+    
+    if self.left and not self.right:
+      map = self.map
+      newick = f"(,{self.left.traverse(newick)}){map}:{self.time}"
+    elif not self.left and self.right:
+      map = self.map
+      newick = f"({self.right.traverse(newick)},){map}:{self.time}"
+    elif self.left and self.right:
+      map = self.map
+      newick = f"({self.right.traverse(newick)},{self.left.traverse(newick)}){map}:{self.time}"
+    elif not self.left and not self.right:
+      map = self.map
+      newick = f"{map}:{self.time}"
+    else:
+      pass
+    return newick
+	
+  def to_newick(self):
+    newick = ""
+    newick = self.traverse(newick)
+    newick = f"{newick};"
+    return newick
 
   def fix_parents(self):
     if self.right != None:
@@ -184,4 +213,12 @@ class node:
         cur = cur.parent
       dists.append((dist, leaf.time))
     return dists
-  
+
+  def map_leaves(self):
+    leaves = self.find_leaves()
+    for i in range(len(leaves)):
+      leaf = leaves[i]
+      leaf.map = f"Species{num2words(i).title()}"
+
+
+	  

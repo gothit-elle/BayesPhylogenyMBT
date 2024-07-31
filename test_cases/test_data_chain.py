@@ -9,7 +9,7 @@ chaina = []
 chainb = []
 chainc = []
 
-i = 7
+i = 103
 with open(f"../thesis_likelihood\csv\c{i+1}a.csv", newline='') as f:
 	reader = csv.reader(f, delimiter='Y')
 	data = list(reader)
@@ -27,17 +27,42 @@ with open(f"../thesis_likelihood\csv\c{i+1}c.csv", newline='') as f:
 	data = list(reader)
 chainc += data
 
-i = 0
-lst = chainb[i]
+j = 0
+lst = chainb[j]
 ind = np.argmax(lst)
-s = chaina[i][ind]
+s = chaina[j][ind]
 t_cur = Tree(1)
 t_cur.str2tree(s,20,by='io')
 t_cur.disp()
-print("lik is: ", chainb[i][ind])
-print("params are: ", chainc[i][ind])
-print('initial lik was: ', chainb[i][0])
-print('initial params are: ', chainc[i][0])
+s_ml = t_cur.head.to_newick()
+
+from ete3 import Tree as Tree_n
+t = Tree_n(s_ml, format = 3)
+# t.convert_to_ultrametric()
+t.show()
+
+print('old tree')
+j = 0
+lst = chainb[j]
+s = chaina[j][0]
+t_cur = Tree(1)
+t_cur.str2tree(s,20,by='io')
+t_cur.disp()
+s_start = t_cur.head.to_newick()
+
+t2 = Tree_n(s_start, format = 3)
+# t2.convert_to_ultrametric()
+t2.show()
+
+# print(t.write(format = 5))
+ret = t.robinson_foulds(t2)
+rf, max_rf = ret[0:2]
+print(f"RF distance is {rf} over a total of {max_rf}")
+
+print("lik is: ", chainb[j][ind])
+print("params are: ", chainc[j][ind])
+print('initial lik was: ', chainb[j][0])
+print('initial params are: ', chainc[j][0])
 N = len(chainb[0])
 plt.plot(range(N), chainb[0])
 params = {'mathtext.default': 'regular' }
@@ -46,4 +71,4 @@ plt.xlabel('Step')
 plt.ylabel('Posterior Log-Likelihood')
 plt.title("Posterior Log-likelihood vs MCMC Step")
 plt.legend(["Chain 1", "Chain 2", "Chain 3", "Chain 4"], loc="lower left")
-plt.savefig("../thesis_likelihood/plots/MCMC_sim.png")
+plt.savefig(f"../thesis_likelihood/plots/MCMC_sim{i}.png")
