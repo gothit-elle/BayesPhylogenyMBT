@@ -10,6 +10,7 @@ import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
+import glob
 
 from MCMCMoves import *
 import csv
@@ -204,10 +205,17 @@ def sim_tree(alpha, D0, d, B, Q1, Pi, time, min_leaves = 2, seq_len = 1, debug =
 	# need to grow all leaves to max leaf dist.
 	t2.head.alter_leaves(t2.obs_time)
 	return t2
+import uuid
+
 
 def target(s, N, t, Q1, alpha, d, D0, B, Pi, i, pos, multip):
+	tstamp = str(uuid.uuid4().hex)
+	print(currentdir + '/csv/*')
+	files = glob.glob(currentdir + '/csv/*')
+	for f in files:
+		os.remove(f)
 	with open(parentdir + '/thesis_likelihood/logs/logr.txt', "w", encoding="utf-8") as f:
-		successes, chaina, chainb, chainc = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos, send_tree=False, multip=multip)
+		successes, chaina, chainb, chainc = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos, send_tree=False, multip=multip, tstamp = tstamp)
 
 	print("acceptance rate", successes/len(chaina))
 	with open(parentdir + f"/csv/c{i+1}a.csv", 'w', newline = '') as csvfile:

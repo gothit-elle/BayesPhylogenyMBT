@@ -4,4 +4,4 @@ matplotlib
 tqdm
 scipy
 num2words
-pyqt5
+PyQt5

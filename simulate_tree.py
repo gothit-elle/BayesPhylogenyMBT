@@ -30,7 +30,7 @@ if __name__ == '__main__':
 	random.seed(26111994)
 	print("beginning simulations...")
 	for i in range(3):
-		trees.append(sim_tree(alpha, D0, d, B, Q1, Pi, stopping_time, min_leaves = 100, seq_len = 1000))
+		trees.append(sim_tree(alpha, D0, d, B, Q1, Pi, stopping_time, min_leaves = 2, seq_len = 10))
 		# trees[-1].disp()
 		print(f"generated tree{i} with {len(trees[-1].head.find_leaves())} nodes")
 	print("simulations done...")

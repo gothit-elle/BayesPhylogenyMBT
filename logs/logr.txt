@@ -1,0 +1,11 @@
+11.73 ~ 'CGATATCTTT' ~ 1.94
+	├──1.94 ~ 'SpeciesZero' ~ 0
+	└──0.36 ~ 'CGATATCATT' ~ 1.58
+		    ├──0.93 ~ 'CAGTATCCAT' ~ 0.65
+			      ├──0.65 ~ 'SpeciesOne' ~ 0
+			      └──0.65 ~ 'SpeciesTwo' ~ 0
+		    └──1.18 ~ 'CCATGTCACT' ~ 0.4
+			      ├──0.4 ~ 'SpeciesThree' ~ 0
+			      └──0.4 ~ 'SpeciesFour' ~ 0
+
+-69.63623669050908

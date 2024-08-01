@@ -5,6 +5,13 @@ from posterior import *
 from tqdm import tqdm
 """# MCMC"""
 
+import os
+import sys
+import inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir) 
+
 debug = 0
 
 BETA = 1.2 # from paper [2]
@@ -316,7 +323,7 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
   
 from decimal import *
 should_break = 0
-def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, send_tree=False, multip = True):
+def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, send_tree=False, multip = True, tstamp=0):
   log = 1
 
   chain1a = []
@@ -377,6 +384,19 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
     chain1a.append(t_cur.toStr())
     chain1b.append(p1)
     chain1c.append((dcpy(alpha), dcpy(d), dcpy(D0), dcpy(B)))
+    if i % 1000 == 0:
+      with open(parentdir + f"/csv/c{tstamp}a.csv", 'a', newline = '') as csvfile:
+        my_writer = csv.writer(csvfile, delimiter = 'Y')
+        my_writer.writerow(chaina)
+
+      with open(parentdir + f"/csv/c{tstamp}b.csv", 'a', newline = '') as csvfile:
+        my_writer = csv.writer(csvfile, delimiter = 'Y')
+        my_writer.writerow(chainb)
+
+      with open(parentdir + f"/csv/c{tstamp}c.csv", 'a', newline = '') as csvfile:
+        my_writer = csv.writer(csvfile, delimiter = 'Y')
+        my_writer.writerow(chainc)
+		
 
 
   return successes, chain1a, chain1b, chain1c
