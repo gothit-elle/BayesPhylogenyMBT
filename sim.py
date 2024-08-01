@@ -3,55 +3,62 @@ from nodestruct import *
 from treestruct import *
 
 import random
+
+import os
 import sys
+import inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir) 
+
 from MCMCMoves import *
 import csv
+from scipy.linalg import expm
 
 BASES = ["A","C", "G", "T"]
 MAPPING_2P = {0: (0,0), 1: (0,1), 2: (1,0), 3: (1,1)}
 
-def sim_evo(cur, Q, Pi):
-
+def sim_evo(cur, Q, Pi, seq_len):
 	if cur == None:
 		return None
-	# if cur.seq == 'N':
-	if cur.seq == 'Failed':
-		return cur
-	u = np.random.uniform(0,1)
-	# select state
-	sum = 0
-	state = 0
-	# this is wrong
-	sum = Pi[0]
-	state= 0
-	# print('alpha is:', alpha, u)
-	for i in range(len(Pi[1:])):
-		elem = Pi[i+1]
-		# print(sum, u, sum+elem)
-		if (sum < u) and (u < (sum + elem)):
-			state = i+1
-		else:
-			sum += elem
-	
-	total_time = 0 
-	while total_time < cur.time:
-		cur.seq = BASES[state]
-		# print(cur.seq)
-		# state = BASES.index(cur.seq)
-		loss = -Q[state, state]
-		t = -1/loss * np.log(u)
-		total_time += t
-		if total_time > cur.time: # the next event will only happen after the branch ends, so ignore it
-			break
+	for seq_index in range(seq_len): # simulate a whole sequence
+		# if cur.seq == 'N':
+		if cur.seq == 'Failed':
+			return cur
 		u = np.random.uniform(0,1)
-		res = event(Q/loss, u, state, True, 0) 
-		state = res[1]
-	cur.seq = BASES[state]
-	
-	pi_new = [0]*len(Pi)
-	pi_new[state] = 1
-	cur.right = sim_evo(cur.right, Q, pi_new)
-	cur.left = sim_evo(cur.left, Q, pi_new)
+		# select state
+
+		if cur.parent == None: # at the root so use the Pi vector for this
+			sum = 0
+			state = 0
+			# this is wrong
+			sum = Pi[0]
+			state= 0
+			# print('alpha is:', alpha, u)
+			for i in range(len(Pi[1:])):
+				elem = Pi[i+1]
+				# print(sum, u, sum+elem)
+				if (sum < u) and (u < (sum + elem)):
+					state = i+1
+				else:
+					sum += elem
+		else: # the state is determined by the parents end state
+			state = BASES.index(cur.parent.seq[seq_index])
+			
+		# we have our state so now lets have a seq 
+		u = np.random.uniform(0,1)
+		res = event(expm(Q*cur.time), u, state, False, 0) 
+		state = int(res[1])
+		if cur.seq == None or cur.seq == 'N':
+			cur.seq = BASES[state]
+		else:
+			cur.seq += BASES[state]
+
+	if not cur.isLeaf():
+		cur.right.parent = cur
+		cur.left.parent = cur
+	cur.right = sim_evo(cur.right, Q, Pi, seq_len)
+	cur.left = sim_evo(cur.left, Q, Pi, seq_len)
 	return cur
 	
 def event(mtrx, u, state, skip, sum):
@@ -98,13 +105,14 @@ def sim_MBT(alpha, D0, d, B, cur, time, stopping_time):
 	# need the 'loss' out of state i
 	loss = -D0[state,state]
 	
-	u = np.random.uniform(0,1)
-	t = -1/loss * np.log(u) # an event happens
+	t = np.random.exponential(loss) # an event happens
 	cur.time += t
+	cur.time = float(cur.time)
 	if time + t> stopping_time: # force stop
 		# print("reached obs time", time, t)
-		cur.time = stopping_time - cur.dist_from_root()
+		cur.time = stopping_time - time
 		return cur
+
 	# the branch keeps living until it dies. so we dont care about length
 	
 	u = np.random.uniform(0,1)
@@ -146,12 +154,23 @@ def sim_MBT(alpha, D0, d, B, cur, time, stopping_time):
 def merge_tree(cur):
 	if cur.isLeaf():
 		return cur
-	if cur.right == None:
-		cur.left.time += cur.time
-		cur = cur.left
-	elif cur.left == None:
-		cur.right.time += cur.time
-		cur = cur.right 
+	if cur.right == None: # merge cur and left child
+		cur.time += cur.left.time
+		cur.map = cur.left.map
+		cur.seq = cur.left.seq
+		cur.right = cur.left.right
+		cur.left = cur.left.left
+		if cur.right != None: cur.right.parent = cur
+		if cur.left != None: cur.left.parent = cur
+
+	elif cur.left == None: # merge cur and right child
+		cur.time += cur.right.time
+		cur.map = cur.right.map
+		cur.seq = cur.right.seq
+		cur.left = cur.right.left
+		cur.right = cur.right.right
+		if cur.right != None: cur.right.parent = cur
+		if cur.left != None: cur.left.parent = cur
 	return cur
 		
 def clean_tree(cur):
@@ -160,36 +179,46 @@ def clean_tree(cur):
 	cur.right = clean_tree(cur.right)
 	cur.left = clean_tree(cur.left)
 	cur = merge_tree(cur)
+	cur.fix_parents()
 	return cur
 		
 
-def sim_tree(alpha, D0, d, B, Q1, Pi, time, debug = False):
+def sim_tree(alpha, D0, d, B, Q1, Pi, time, min_leaves = 2, seq_len = 1, debug = False):
 	t2 = Tree(1)
 	t2.head = node('N', None, 0)
 	t2.head = sim_MBT(alpha, D0, np.array(d), B, t2.head, 0, time)
-	if debug: t2.disp()
 	t2.head.prune_tree()
-	if debug: t2.disp()
 	t2.head = clean_tree(t2.head)
-	if debug: t2.disp()
-	t2.head = sim_evo(t2.head, Q1, Pi)
+	while t2.head.right == None or t2.head.left == None or len(t2.head.find_leaves()) < min_leaves:
+		t2.head = sim_MBT(alpha, D0, np.array(d), B, t2.head, 0, time)
+		t2.head.prune_tree()
+		t2.head = clean_tree(t2.head)
+
+
+
+	t2.obs_time = t2.head.find_max_dist()
+	t2.seq_len = seq_len
+	t2.head = sim_evo(t2.head, Q1, Pi, seq_len)
 	t2.head.map_leaves()
+
+	# need to grow all leaves to max leaf dist.
+	t2.head.alter_leaves(t2.obs_time)
 	return t2
 
 def target(s, N, t, Q1, alpha, d, D0, B, Pi, i, pos):
-	with open('../thesis_likelihood\logs\logr.txt', "w", encoding="utf-8") as f:
+	with open(parentdir + '/thesis_likelihood/logs/logr.txt', "w", encoding="utf-8") as f:
 		successes, chaina, chainb, chainc = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos)
 
 	print("acceptance rate", successes/len(chaina))
-	with open(f"../thesis_likelihood\csv\c{i+1}a.csv", 'w', newline = '') as csvfile:
+	with open(parentdir + f"/csv/c{i+1}a.csv", 'w', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
 		my_writer.writerow(chaina)
 
-	with open(f"../thesis_likelihood\csv\c{i+1}b.csv", 'w', newline = '') as csvfile:
+	with open(parentdir + f"/csv/c{i+1}b.csv", 'w', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
 		my_writer.writerow(chainb)
 		
-	with open(f"../thesis_likelihood\csv\c{i+1}c.csv", 'w', newline = '') as csvfile:
+	with open(parentdir + f"/csv/c{i+1}c.csv", 'w', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
 		my_writer.writerow(chainc)
 		

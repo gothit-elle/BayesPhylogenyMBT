@@ -1,0 +1,7 @@
+numpy
+ete3
+matplotlib
+tqdm
+scipy
+num2words
+PyQt5

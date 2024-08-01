@@ -316,15 +316,17 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
   
 from decimal import *
 should_break = 0
-def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1):
+def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, send_tree=False):
   log = 1
 
   chain1a = []
   chain1b = []
   chain1c = []
-
-  t_cur = Tree(1)
-  t_cur.str2tree(s,t,by=by)
+  if send_tree:
+    t_cur = s
+  else:
+    t_cur = Tree(1)
+    t_cur.str2tree(s,t,by=by)
   t_cur.disp(log, fname)
   p1 = tree_posterior(t_cur, alpha, d, D0, B, Q1, Pi)
   print(p1, file=fname)

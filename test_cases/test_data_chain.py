@@ -1,7 +1,11 @@
 import csv
 import matplotlib.pyplot as plt
+import os
 import sys
-sys.path.insert(0, '../thesis_likelihood')
+import inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir) 
 import numpy as np
 from treestruct import *
 
@@ -9,20 +13,20 @@ chaina = []
 chainb = []
 chainc = []
 
-i = 103
-with open(f"../thesis_likelihood\csv\c{i+1}a.csv", newline='') as f:
+i = 101
+with open(parentdir + f"/csv/c{i+1}a.csv", newline='') as f:
 	reader = csv.reader(f, delimiter='Y')
 	data = list(reader)
 chaina += data
 
-with open(f"../thesis_likelihood\csv\c{i+1}b.csv", newline='') as f:
+with open(parentdir + f"/csv/c{i+1}b.csv", newline='') as f:
 	data= []
 	reader = csv.reader(f,  delimiter='Y')
 	for line in reader:
 		data.append([float(x) for x in line])
 chainb += data
 
-with open(f"../thesis_likelihood\csv\c{i+1}c.csv", newline='') as f:
+with open(parentdir + f"/csv/c{i+1}c.csv", newline='') as f:
 	reader = csv.reader(f,  delimiter='Y')
 	data = list(reader)
 chainc += data
@@ -39,7 +43,7 @@ s_ml = t_cur.head.to_newick()
 from ete3 import Tree as Tree_n
 t = Tree_n(s_ml, format = 3)
 # t.convert_to_ultrametric()
-t.show()
+# t.show()
 
 print('old tree')
 j = 0
@@ -52,7 +56,7 @@ s_start = t_cur.head.to_newick()
 
 t2 = Tree_n(s_start, format = 3)
 # t2.convert_to_ultrametric()
-t2.show()
+# t2.show()
 
 # print(t.write(format = 5))
 ret = t.robinson_foulds(t2)
@@ -71,4 +75,4 @@ plt.xlabel('Step')
 plt.ylabel('Posterior Log-Likelihood')
 plt.title("Posterior Log-likelihood vs MCMC Step")
 plt.legend(["Chain 1", "Chain 2", "Chain 3", "Chain 4"], loc="lower left")
-plt.savefig(f"../thesis_likelihood/plots/MCMC_sim{i}.png")
+plt.savefig(parentdir + f"/plots/MCMC_sim{i}.png")

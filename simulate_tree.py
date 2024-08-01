@@ -2,9 +2,13 @@ from sim import *
 from buildmtrx import *
 import numpy as np 
 
-def main():
-	time = 7
-	alpha = np.array([0.5,0.5]).astype(object)
+
+
+import multiprocessing
+
+if __name__ == '__main__':
+	stopping_time = 10
+	alpha = np.array([0.7,0.3]).astype(object)
 	d, D0, D1, B = build_mtrx(mu0= 0.15, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
 
 	
@@ -22,33 +26,25 @@ def main():
 	Q1 -= np.diag(Q1@np.ones(4))
 	
 	trees = []
-	for i in range(3):
-		trees.append(sim_tree_i(alpha, D0, d, B, Q1, Pi, time))
 	
-	return trees[0], trees[1], trees[2], Q1, Pi, alpha, d, D0, D1, B
-
-def sim_tree_i(alpha, D0, d, B, Q1, Pi, time):
-	t_next = sim_tree(alpha, D0, d, B, Q1, Pi, time)
-	t_next.obs_time = time
-
-	while t_next.head.right == None or t_next.head.left == None:
-		t_next = sim_tree(alpha, D0, d, B, Q1, Pi, time)
-		t_next.obs_time = time
-	t_next.disp()
-	return t_next	
-
-import multiprocessing
-
-if __name__ == '__main__':
 	random.seed(26111994)
-	t1, t2, t3, Q1, Pi, alpha, d, D0, D1, B = main()
+	print("beginning simulations...")
+	for i in range(3):
+		trees.append(sim_tree(alpha, D0, d, B, Q1, Pi, stopping_time, min_leaves = 100, seq_len = 1000))
+		# trees[-1].disp()
+		print(f"generated tree{i} with {len(trees[-1].head.find_leaves())} nodes")
+	print("simulations done...")
+	print("starting MCMC chains...")
+	t1, t2, t3 = trees
 	multiprocessing.freeze_support()
-	N = 5000
+	N = 10000
 	t = t2.obs_time
+	
 	str1 = t1.toStr()
 	str2 = t2.toStr()
 	str3 = t3.toStr()
-	#print('lik is', log_lik(t2, Q1, Pi, False))
+
+	# print('lik is', log_lik(t2, Q1, Pi, False))
 	
 	t1 = multiprocessing.Process(target=target, args = (str1, N, t, Q1, alpha, d, D0, B, Pi, 101, 1,))
 	t2 = multiprocessing.Process(target=target, args = (str2, N, t, Q1, alpha, d, D0, B, Pi, 102, 2,))
