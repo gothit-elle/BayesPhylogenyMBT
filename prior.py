@@ -11,6 +11,8 @@ from scipy.integrate import odeint, solve_ivp
 import matplotlib.pyplot as plt
 import re
 import warnings
+from multiprocessing import Pool
+from itertools import repeat
 
 warnings.filterwarnings("error")
 
@@ -122,12 +124,12 @@ def ext_f(bm_hat, alpha, d, D0, B):
 
 def int_f(cur, alpha, d, D0, B):
   if (cur.isLeaf()):
-    lik = ext_f(cur.time, alpha, d, D0, B) # this is correct.
+    lik = cur.prior # ext_f(cur.time, alpha, d, D0, B) # this is correct.
 
   else:
     t_left = int_f(cur.left, alpha, d, D0, B)
     t_right = int_f(cur.right, alpha, d, D0, B)
-    G_val = np.array(G_bkxk(cur.time, cur.dist_from_tip(), alpha, d, D0, B)).astype(object)
+    G_val = cur.gval
 
     prod = np.kron(t_left, t_right).astype(object) + np.kron(t_right, t_left).astype(object)
     lik = G_val@B@(prod)
@@ -135,12 +137,33 @@ def int_f(cur, alpha, d, D0, B):
   return np.array(lik).astype(object)
 
 
-def tree_prior(tree, alpha, d, D0, B, log=True, fname = None):
+def tree_prior(tree, alpha, d, D0, B, log=True, fname = None, multip=False):
   cur = tree.head
+  parents = cur.find_parents()
+  leaves = cur.find_leaves()
+  if multip:
+    pool = Pool()
+    results = pool.starmap(ext_f, zip([leaf.time for leaf in leaves], repeat(alpha), repeat(d), repeat(D0), repeat(B)))
+    pool.close()
+    for i in range(len(results)):
+      leaves[i].prior = results[i]
+	  
+    pool = Pool()
+    results = pool.starmap(G_bkxk, zip([parent.time for parent in parents], [parent.dist_from_tip() for parent in parents], repeat(alpha), repeat(d), repeat(D0), repeat(B)))
+    pool.close()
+    for i in range(len(results)):
+      parents[i].gval = results[i]
+	  
+  else:
+    for leaf in leaves:
+      leaf.prior = ext_f(leaf.time, alpha, d, D0, B)
+    for parent in parents:
+      parent.gval = np.array(G_bkxk(parent.time,parent.dist_from_tip(), alpha, d, D0, B)).astype(object)
+  
   # doesnt work with fractional lengths?
   t_left = int_f(cur.left, alpha, d, D0, B)
   t_right = int_f(cur.right, alpha, d, D0, B)
-  G_val = np.array(G_bkxk(cur.time,cur.dist_from_tip(), alpha, d, D0, B)).astype(object)
+  G_val = cur.gval
   alpha = np.array(alpha).astype(object)
   prod = np.array(np.kron(t_right, t_left) + np.kron(t_left, t_right)).astype(object)
   val = alpha@G_val@B@prod

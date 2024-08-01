@@ -316,7 +316,7 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
   
 from decimal import *
 should_break = 0
-def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, send_tree=False):
+def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, send_tree=False, multip = True):
   log = 1
 
   chain1a = []
@@ -328,7 +328,7 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
     t_cur = Tree(1)
     t_cur.str2tree(s,t,by=by)
   t_cur.disp(log, fname)
-  p1 = tree_posterior(t_cur, alpha, d, D0, B, Q1, Pi)
+  p1 = tree_posterior(t_cur, alpha, d, D0, B, Q1, Pi, debug=False, fname = fname, multip=multip)
   print(p1, file=fname)
 
 
@@ -346,7 +346,7 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
       # p1 = tree_posterior(t_cur, alpha, d, D0, B, Q1) # i dont need this right?
       if debug: print("operating on: ")
       if debug: t_new.disp()
-      p_new = tree_posterior(t_new, alpha_new, d_new, D0_new, B_new, Q1, Pi, log, fname)
+      p_new = tree_posterior(t_new, alpha_new, d_new, D0_new, B_new, Q1, Pi, log, fname, multip=multip)
       
       if p_new == 1:
         print("prev tree was: ", file=fname)

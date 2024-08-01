@@ -1,4 +1,6 @@
 from scipy.linalg import fractional_matrix_power, expm
+from multiprocessing import Pool, freeze_support, cpu_count
+from itertools import repeat
 import numpy as np
 BASES = ["A","C", "G", "T"]
 
@@ -43,11 +45,10 @@ def cond_likelihood(tree, P, index, Pi, debug=False):
   if debug: print("printing...", cur.seq, cur.time, cur.lik)
   return cur.lik
 
-from multiprocessing import Pool, freeze_support, cpu_count
-from itertools import repeat
+
 
 def sub_lik(k, new_tree, P, Pi, debug=False):
-  return np.log(sum([i*j for (i,j) in zip(Pi,cond_likelihood(new_tree.head, P, k, Pi, debug))]))
+  return np.log(sum([i*j for (i,j) in zip(Pi,cond_likelihood(new_tree.head, P, k, Pi, False))]))
   
 def log_lik(new_tree, P, Pi, debug=False, multip=False):
   # returns the loglik of the tree
@@ -57,7 +58,7 @@ def log_lik(new_tree, P, Pi, debug=False, multip=False):
   if multip:
     if __name__ == 'likelihood':
       pool = Pool()
-      results = pool.starmap(sub_lik, zip(range(seq_len), repeat(new_tree), repeat(P), repeat(Pi), repeat(debug)))
+      results = pool.starmap(sub_lik, zip(range(seq_len), repeat(new_tree), repeat(P), repeat(Pi)))
       pool.close()
   else: 
     results = []

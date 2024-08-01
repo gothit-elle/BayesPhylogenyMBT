@@ -205,9 +205,9 @@ def sim_tree(alpha, D0, d, B, Q1, Pi, time, min_leaves = 2, seq_len = 1, debug =
 	t2.head.alter_leaves(t2.obs_time)
 	return t2
 
-def target(s, N, t, Q1, alpha, d, D0, B, Pi, i, pos):
+def target(s, N, t, Q1, alpha, d, D0, B, Pi, i, pos, multip):
 	with open(parentdir + '/thesis_likelihood/logs/logr.txt', "w", encoding="utf-8") as f:
-		successes, chaina, chainb, chainc = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos)
+		successes, chaina, chainb, chainc = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos, send_tree=False, multip=multip)
 
 	print("acceptance rate", successes/len(chaina))
 	with open(parentdir + f"/csv/c{i+1}a.csv", 'w', newline = '') as csvfile:

@@ -7,7 +7,7 @@ import numpy as np
 import multiprocessing
 
 if __name__ == '__main__':
-	stopping_time = 10
+	stopping_time = 7
 	alpha = np.array([0.7,0.3]).astype(object)
 	d, D0, D1, B = build_mtrx(mu0= 0.15, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
 
@@ -46,14 +46,15 @@ if __name__ == '__main__':
 
 	# print('lik is', log_lik(t2, Q1, Pi, False))
 	
-	t1 = multiprocessing.Process(target=target, args = (str1, N, t, Q1, alpha, d, D0, B, Pi, 101, 1,))
-	t2 = multiprocessing.Process(target=target, args = (str2, N, t, Q1, alpha, d, D0, B, Pi, 102, 2,))
-	t3 = multiprocessing.Process(target=target, args = (str3, N, t, Q1, alpha, d, D0, B, Pi, 103, 3,))
+	target(str1, N, t, Q1, alpha, d, D0, B, Pi, 101, 1, multip=True)
+	#t1 = multiprocessing.Process(target=target, args = (str1, N, t, Q1, alpha, d, D0, B, Pi, 101, 1,))
+	#t2 = multiprocessing.Process(target=target, args = (str2, N, t, Q1, alpha, d, D0, B, Pi, 102, 2,))
+	#t3 = multiprocessing.Process(target=target, args = (str3, N, t, Q1, alpha, d, D0, B, Pi, 103, 3,))
 
-	t1.start()
-	t2.start()
-	t3.start()
+	#t1.start()
+	#t2.start()
+	#t3.start()
 
-	t1.join()
-	t2.join()
-	t3.join()
+	#t1.join()
+	#t2.join()
+	#t3.join()

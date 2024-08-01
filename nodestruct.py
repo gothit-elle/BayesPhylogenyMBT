@@ -11,6 +11,8 @@ class node:
     self.time = time
     self.lik = None
     self.map = None
+    self.prior = None
+    self.gval = None
 
   def __str__(self, level=0):
     #ret = "\t"*level+"time: " + repr(self.time)+' / '+repr(self.seq)+"\n" # original
@@ -202,6 +204,14 @@ class node:
     leaves += l_r + l_l
     return leaves
 
+  def find_parents(self):
+    parents = []
+    if not self.isLeaf():
+      parents += [self]
+      parents += self.right.find_parents()
+      parents += self.left.find_parents()
+    return parents
+	
   def find_leaf_dists(self):
     dists = []
     leaves = self.find_leaves()
