@@ -4,7 +4,7 @@ from treestruct import *
 from posterior import *
 from tqdm import tqdm
 """# MCMC"""
-
+import csv
 import os
 import sys
 import inspect
@@ -385,18 +385,18 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
     chain1b.append(p1)
     chain1c.append((dcpy(alpha), dcpy(d), dcpy(D0), dcpy(B)))
     if i % 1000 == 0:
-      with open(parentdir + f"/csv/c{tstamp}a.csv", 'a', newline = '') as csvfile:
+      with open(currentdir + f"/csv/c{tstamp}a.csv", 'a+', newline = '') as csvfile:
         my_writer = csv.writer(csvfile, delimiter = 'Y')
-        my_writer.writerow(chaina)
-
-      with open(parentdir + f"/csv/c{tstamp}b.csv", 'a', newline = '') as csvfile:
+        my_writer.writerow(chain1a)
+      csvfile.close()
+      with open(currentdir + f"/csv/c{tstamp}b.csv", 'a+', newline = '') as csvfile:
         my_writer = csv.writer(csvfile, delimiter = 'Y')
-        my_writer.writerow(chainb)
-
-      with open(parentdir + f"/csv/c{tstamp}c.csv", 'a', newline = '') as csvfile:
+        my_writer.writerow(chain1b)
+      csvfile.close()
+      with open(currentdir + f"/csv/c{tstamp}c.csv", 'a+', newline = '') as csvfile:
         my_writer = csv.writer(csvfile, delimiter = 'Y')
-        my_writer.writerow(chainc)
-		
+        my_writer.writerow(chain1c)
+      csvfile.close()
 
 
   return successes, chain1a, chain1b, chain1c

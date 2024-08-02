@@ -210,10 +210,10 @@ import uuid
 
 def target(s, N, t, Q1, alpha, d, D0, B, Pi, i, pos, multip):
 	tstamp = str(uuid.uuid4().hex)
-	print(currentdir + '/csv/*')
-	files = glob.glob(currentdir + '/csv/*')
-	for f in files:
-		os.remove(f)
+	#print(currentdir + '/csv/*')
+	#files = glob.glob(currentdir + '/csv/*')
+	#for f in files:
+	#	os.remove(f)
 	with open(parentdir + '/thesis_likelihood/logs/logr.txt', "w", encoding="utf-8") as f:
 		successes, chaina, chainb, chainc = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos, send_tree=False, multip=multip, tstamp = tstamp)
 

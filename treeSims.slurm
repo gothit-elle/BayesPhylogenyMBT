@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --ntasks=1 --cpus-per-task 72
+#SBATCH --ntasks-per-node=1 --cpus-per-task 72
 #SBATCH --time=7-24:00:00
 
 # Load required modules
@@ -18,4 +18,4 @@ python3 -m pip install PyQt5
 
 # Launch multiple process python code
 echo "running code"
-python simulate_tree.py
+python3 simulate_tree.py
