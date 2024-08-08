@@ -87,7 +87,7 @@ def ext_bd(t):
   return num/denom
 
 
-def int_bd(cur):
+def int_bd(cur, adj=True):
   if (cur.isLeaf()):
     lik = ext_bd(cur.time)
 
@@ -95,18 +95,19 @@ def int_bd(cur):
     t_left = int_bd(cur.left)
     t_right = int_bd(cur.right)
     G_val = G_bd(cur.time, cur.dist_from_tip())
-
+    if adj==False: G_val = 1
     prod = 2*t_left*t_right
     lik = G_val*lambda0*prod
 
   return lik
 
-def bd_lik(tree, log=True):
+def bd_lik(tree, log=True, adj = True):
   cur = tree.head
   # doesnt work with fractional lengths?
-  t_left = int_bd(cur.left)
-  t_right = int_bd(cur.right)
+  t_left = int_bd(cur.left, adj)
+  t_right = int_bd(cur.right, adj)
   G_val = np.array(G_bd(cur.time,cur.dist_from_tip()))
+  if adj == False: G_val = 1
   alpha = 1
   prod = 2*t_left*t_right
   val = G_val*lambda0*prod
@@ -115,12 +116,12 @@ def bd_lik(tree, log=True):
   return val
 
 p1 = ext_bd(9)*ext_bd(9)*ext_bd(17)*ext_bd(18)
-print(ext_bd(9))
-print(ext_bd(17))
-print(ext_bd(18))
+#print(ext_bd(9))
+#print(ext_bd(17))
+#print(ext_bd(18))
 
 p2 = G_bd(8,9)*G_bd(1,17)*G_bd(2,18)
-print(np.log(p1*p2*(2*lambda0)**3))
+#print(np.log(p1*p2*(2*lambda0)**3))
 
 plot = 0
 alpha = [0.5,0.5]
@@ -130,7 +131,8 @@ q10 = q01 = 0
 
 d, D0, D1, B = build_mtrx(mu0, mu1, q01, q10, lambda0, lambda1)
 print(bd_lik(t2))
-lik = tree_prior(t2, alpha, d, D0, B)
+
+lik = tree_prior(t2, alpha, d, D0, B, logit=True, fname = None, multip=False)
 print(lik)
 
 
@@ -161,12 +163,12 @@ trees.append(t2)
 t2.disp()
 
 for tree in trees:
-  a = bd_lik( tree)
+  a = bd_lik(tree)
   b = tree_prior(tree, alpha, d, D0, B)
   print("lin bd llik: ", a)
   print("MBT llik: ", b)
-  print("\tratio", a/b)
-  print("\tdifference", a-b)
+  #print("\tratio", a/b)
+  #print("\tdifference", a-b)
 
 nodeStr = "2A.1T.17C.8G.9G.9T.18A." # nodes and branch lengths
 t=20 # obs time
@@ -181,25 +183,40 @@ for i in range(20):
   move = propose_move(t_current,alpha, d, D0, B, i)
 
   if move != EXIT_FAILURE:
-    t_new, q_ratio, alpha, d, D0, B = move
+    t_new, q_ratio, alpha_n, d_n, D0_n, B_n = move
     trees.append(t_new)
 print(len(trees))
 
 l1 = []
 l2 = []
+l3=[]
 for i in range(len(trees)):
   print(i)
   tree = trees[i]
   tree.disp()
-  a = lin_bd_lik(lambda0, mu0, tree)
+  a = bd_lik(tree, True, True)
+  c = bd_lik(tree, True, False)
   b = tree_prior(tree, alpha, d, D0, B)
   l1.append((i, a))
   l2.append((i,b))
+  l3.append((i,c))
 
 c = sorted(l1, key=lambda x: x[1])
 
 f = sorted(l2, key=lambda x: x[1])
 
+g = sorted(l3, key=lambda x: x[1])
 print(c)
 print(f)
+print(g)
+
+
+from ete3 import Tree as Tree_n
+
+
+for i in range(len(trees)):
+  s_ml = trees[i].head.to_newick()
+  t = Tree_n(s_ml, format = 3)
+  # t.convert_to_ultrametric()
+  t.show()
 # the order of conclusions are the same, my model works!!!

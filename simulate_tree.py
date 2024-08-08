@@ -7,6 +7,7 @@ import numpy as np
 import multiprocessing
 
 if __name__ == '__main__':
+	print('cpu_count is', cpu_count())
 	stopping_time = 15
 	alpha = np.array([0.7,0.3]).astype(object)
 	d, D0, D1, B = build_mtrx(mu0= 0.15, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
@@ -30,8 +31,8 @@ if __name__ == '__main__':
 	random.seed(26111994)
 	print("beginning simulations...")
 	#for i in range(3):
-	t1 = sim_tree(alpha, D0, d, B, Q1, Pi, stopping_time, min_leaves = 100, seq_len = 1000)
-		# trees[-1].disp()
+	t1 = sim_tree(alpha, D0, d, B, Q1, Pi, stopping_time, min_leaves = 50, seq_len = 500)
+	t1.disp()
 	print(f"\tgenerated tree with {len(t1.head.find_leaves())} nodes")
 	print("simulations done...")
 	print("starting MCMC chains...")
@@ -39,7 +40,7 @@ if __name__ == '__main__':
 	multiprocessing.freeze_support()
 	N = 10000
 	t = t1.obs_time
-	t1.disp()
+	# t1.disp()
 	str1 = t1.toStr()
 	
 	#str2 = t2.toStr()

@@ -2,6 +2,14 @@
 
 """
 import numpy as np
+from scipy.integrate import odeint, solve_ivp
+import matplotlib.pyplot as plt
+from prior import *
+from buildmtrx import *
+
+alpha = np.array([0.5,0.5]).astype(object)
+d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.01, lambda0 = 1, lambda1 = 0.099)
+
 plot = 1
 toler = 1e-7
 def G_bkxk2(z,x):
@@ -66,40 +74,40 @@ for elem in Z00:
   plt.title("G(z,x)$_{00}$ for different x values")
   plt.legend(['x='+str(i) for i in np.linspace(0,10,11)], loc="upper right")
   plt.savefig("../thesis_likelihood/plots/g00.png")
-
+plt.clf()
 for elem in Z01:
   plt.plot(np.linspace(0,5), elem, next(cols))
   params = {'mathtext.default': 'regular' }
   plt.rcParams.update(params)
-  plt.axis([0, 5, 0, 0.5])
+  plt.axis([0, 5, 0, 1])
   plt.xlabel('t')
   plt.ylabel('G(z,x)$_{01}$')
   plt.title("G(z,x)$_{01}$ for different x values")
   plt.legend(['x='+str(i) for i in np.linspace(0,10,11)], loc="lower right")
   plt.savefig("../thesis_likelihood/plots/g01.png")
-
+plt.clf()
 for elem in Z10:
   plt.plot(np.linspace(0,5), elem, next(cols))
   params = {'mathtext.default': 'regular' }
   plt.rcParams.update(params)
-  plt.axis([0, 5, 0, 0.05])
+  plt.axis([0, 5, 0, 0.01])
   plt.xlabel('t')
   plt.ylabel('G(z,x)$_{10}$')
   plt.title("G(z,x)$_{10}$ for different x values")
   plt.legend(['x='+str(i) for i in np.linspace(0,10,11)], loc="lower right")
   plt.savefig("../thesis_likelihood/plots/g10.png")
-
+plt.clf()
 for elem in Z11:
   plt.plot(np.linspace(0,5), elem, next(cols))
   params = {'mathtext.default': 'regular' }
   plt.rcParams.update(params)
-  plt.axis([0, 5, 0.4, 1])
+  plt.axis([0, 5, 0, 1])
   plt.xlabel('t')
   plt.ylabel('G(z,x)$_{11}$')
   plt.title("G(z,x)$_{11}$ for different x values")
   plt.legend(['x='+str(i) for i in np.linspace(0,10,11)], loc="upper right")
   plt.savefig("../thesis_likelihood/plots/g11.png")
-
+plt.clf()
 if plot:
   fig = plt.figure()
   ax = plt.axes(projection='3d')
@@ -111,7 +119,7 @@ if plot:
   plt.title("Plot of G(z,x)$_{00}$")
   plt.tight_layout()
   plt.savefig("../thesis_likelihood/plots/g003d.png")
-
+	
   fig = plt.figure()
   ax = plt.axes(projection='3d')
   ax.dist = 13

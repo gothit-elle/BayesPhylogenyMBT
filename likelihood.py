@@ -43,6 +43,7 @@ def cond_likelihood(tree, P, index, Pi, debug=False):
       L.append(left*right)
     cur.lik = L
   if debug: print("printing...", cur.seq, cur.time, cur.lik)
+  cur.changed = 0
   return cur.lik
 
 

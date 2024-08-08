@@ -101,8 +101,7 @@ def G_bkxk(z,x, alpha, d, D0, B, plot=0):
 
 
 # handles the external branches likelihood calc
-def ext_f(bm_hat, alpha, d, D0, B):
-
+def ext_f(bm_hat, alpha, d, D0, B, times = None):
   def f(t, state):
     # partition state. NB: will need to use a lookup for >2 states
     for i in range(len(state)):
@@ -117,9 +116,9 @@ def ext_f(bm_hat, alpha, d, D0, B):
 
   state0 = np.array([0,0, 1,1]) # E(0) = 0, D_1 = 1 initial conds
   #times = np.linspace(0,bm_hat)
-  x_sol = solve_ivp(f, [0, bm_hat], state0,  atol=toler, rtol = toler)
+  x_sol = solve_ivp(f, [0, bm_hat], state0, t_eval = times, atol=toler, rtol = toler)
 
-  return np.array(x_sol.y[2:4, -1]).astype(object) # need to return D_1 at time bm_hat
+  return np.array(x_sol.y[2:4, :]).astype(object) # need to return D_1 at time bm_hat
 
 
 def int_f(cur, alpha, d, D0, B):
@@ -137,17 +136,27 @@ def int_f(cur, alpha, d, D0, B):
   return np.array(lik).astype(object)
 
 
-def tree_prior(tree, alpha, d, D0, B, log=True, fname = None, multip=False):
+def tree_prior(tree, alpha, d, D0, B, logit=True, fname = None, multip=False):
   cur = tree.head
   parents = cur.find_parents()
   leaves = cur.find_leaves()
-  if multip:
-    pool = Pool()
-    results = pool.starmap(ext_f, zip([leaf.time for leaf in leaves], repeat(alpha), repeat(d), repeat(D0), repeat(B)))
-    pool.close()
-    for i in range(len(results)):
-      leaves[i].prior = results[i]
-	  
+  def ret(e):
+    return e.time
+  leaves.sort(key=ret)
+  times = [leaf.time for leaf in leaves]
+
+  # pool = Pool()
+  #results = pool.starmap(ext_f, zip([leaf.time for leaf in leaves], repeat(alpha), repeat(d), repeat(D0), repeat(B)))
+  #pool.close()
+  bm_hat = max(times)
+  t_eval = list(set(times))
+  t_eval.sort()
+  results = ext_f(bm_hat, alpha, d, D0, B, times = t_eval)
+  res = dict(map(lambda i,j : (i,j) , t_eval,np.transpose(results)))
+  for i in range(len(times)):
+    leaves[i].prior = res[times[i]]
+
+  if multip:  
     pool = Pool()
     results = pool.starmap(G_bkxk, zip([parent.time for parent in parents], [parent.dist_from_tip() for parent in parents], repeat(alpha), repeat(d), repeat(D0), repeat(B)))
     pool.close()
@@ -155,8 +164,6 @@ def tree_prior(tree, alpha, d, D0, B, log=True, fname = None, multip=False):
       parents[i].gval = results[i]
 	  
   else:
-    for leaf in leaves:
-      leaf.prior = ext_f(leaf.time, alpha, d, D0, B)
     for parent in parents:
       parent.gval = np.array(G_bkxk(parent.time,parent.dist_from_tip(), alpha, d, D0, B)).astype(object)
   
@@ -168,11 +175,11 @@ def tree_prior(tree, alpha, d, D0, B, log=True, fname = None, multip=False):
   prod = np.array(np.kron(t_right, t_left) + np.kron(t_left, t_right)).astype(object)
   val = alpha@G_val@B@prod
   try:
-    if log:
+    if logit:
       val = np.log(val)
   except RuntimeWarning as rw:
     print("\n", rw, "val=", val)
-    tree.disp(log, fname = fname)
+    tree.disp(logit, fname = fname)
     print(tree.toStr(), alpha, d, D0, B, file = fname)
     val = 1 # impossible as probs are < 1
   return val

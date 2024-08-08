@@ -13,13 +13,14 @@ class node:
     self.map = None
     self.prior = None
     self.gval = None
+    self.changed = False
 
   def __str__(self, level=0):
     #ret = "\t"*level+"time: " + repr(self.time)+' / '+repr(self.seq)+"\n" # original
     if self.map != None:
       mid_val = self.map
     else:
-      mid_val = self.seq
+      mid_val = 'N' #self.seq
     ret = repr(round(self.time,2)) + ' ~ ' + repr(mid_val)+ ' ~ ' +repr(round(self.dist_from_tip(),2)) +"\n"
     if level != 0:
       ex = ' '*round((level+1)*1.8 + 0.9)
@@ -33,13 +34,13 @@ class node:
 
   def __repr__(self):
     return '<tree rep>'
-	
+    
   def is_neg(self):
     if self == None:
       return False
     if self.time <= 0 or (self.right != None and self.right.is_neg()) or (self.left != None and self.left.is_neg()):
       return True
-	  
+      
   def isLeaf(self):
     if (self.left == None) and (self.right==None):
       return True
@@ -59,16 +60,33 @@ class node:
         return t
       t += cur.time
 
+  def associative_mark(self):
+    if self.changed == 1 or self.changed == -1:
+      return -1
+    else:
+      ret = 0
+      if self.right != None: ret += self.right.associative_mark()
+      if self.left != None: ret += self.left.associative_mark()
+      self.changed = max(-1, ret)
+      return self.changed
+	 
+  def mark_tree(self):
+    self.changed = True
+    if self.right != None: self.right.mark_tree()
+    if self.left != None: self.left.mark_tree()
+
   def scale_tree(self, delta):
-      self.time *= delta
-      if self.right != None:
-        self.right.scale_tree(delta)
-      if self.left != None:
-        self.left.scale_tree(delta)
+    self.time *= delta
+    self.changed = True
+    if self.right != None:
+      self.right.scale_tree(delta)
+    if self.left != None:
+      self.left.scale_tree(delta)
 
   def alter_leaves(self, scale):
     if self.isLeaf():
       self.time = scale
+      self.changed = True
     else:
       self.right.alter_leaves(scale-self.time)
       self.left.alter_leaves(scale-self.time)
@@ -85,8 +103,10 @@ class node:
     if self.isLeaf():
       dist = self.dist_from_root()
       self.time = obs_time - dist
+      self.changed = True
     else:
       self.time *= delta
+      self.changed = True
       self.right.scale_parents(delta, obs_time)
       self.left.scale_parents(delta, obs_time)
 
@@ -95,7 +115,7 @@ class node:
       if leaf.seq == 'F':
         return True
     return False
-	
+    
   def prune_tree(self):
     leaves= self.find_leaves()
     while self.can_prune():
@@ -108,7 +128,7 @@ class node:
           else:
             leaf.parent.left = None
 
-			
+            
   def find_max_dist(self):
     d1= 0
     d2= 0
@@ -153,8 +173,8 @@ class node:
         ret += self.right.toStr()
       ret += ")"
     return ret
-	
-	
+    
+    
 # two functions below copied from https://stackoverflow.com/a/61123048
 
 
@@ -175,7 +195,7 @@ class node:
     else:
       pass
     return newick
-	
+    
   def to_newick(self):
     newick = ""
     newick = self.traverse(newick)
@@ -211,7 +231,7 @@ class node:
       parents += self.right.find_parents()
       parents += self.left.find_parents()
     return parents
-	
+    
   def find_leaf_dists(self):
     dists = []
     leaves = self.find_leaves()
@@ -231,4 +251,4 @@ class node:
       leaf.map = f"Species{num2words(i).title()}"
 
 
-	  
+      

@@ -30,9 +30,11 @@ class Tree:
         if val > 0: # we are slightly under. 'grow' the branch
           # print("case a")
           leaves[i].time += val
+          leaves[i].changed = True
         elif val < 0 and abs(val) < tolerance: # we have a branch of length tolerance, and our value is val units under (if its over it doesnt matter)
           # print("case b")
           leaves[i].time += val
+          leaves[i].changed = True
         else: # damn how did this happen? need to rescale the entire tree.
           max_dist = self.head.find_max_dist()
           self.head.alter_leaves(max_dist) # grow the leaves

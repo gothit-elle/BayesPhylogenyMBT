@@ -82,14 +82,19 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
     if debug: print("node i", n_i, i.seq, "node j", n_j, j.seq)
     replace_root = (j==1)
 
-
+    # i.changed= True
+    # j.changed=True
     ip = i.parent
     jp = j.parent
-    
+
+	
     if (jp != None and jp.dist_from_tip() <= i.dist_from_tip()) or (i == j) or (ip == j) or (ip == jp) or (ip == None):
       return EXIT_FAILURE
     else:
       ipp = i.parent.parent
+      # ip.changed = True
+      # jp.changed = True
+      # ipp.changed = True
       replace_root2 = (ipp == None)
       idft = i.dist_from_tip()
       jdft = j.dist_from_tip()
@@ -102,7 +107,7 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
       else:
         k = ip.left
 
-
+      # k.changed = True
       # calculate Q
       if jp == None:
         delta = np.random.exponential(theta)
@@ -172,13 +177,16 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
     # warnings.warn("Warning: nodes are a fixed choice here")
     # n_i = 3
     i = find_node_n(cur, 0, n_i)
+    # i.changed = True
     if debug: print("node i", n_i, i.seq, i.time, i.dist_from_tip())
     ip = i.parent
+    
     if ip == None or ip.parent == None:
       return EXIT_FAILURE
     else:
+      # ip.changed=True
       ipp = ip.parent
-
+      # ipp.changed = True
       if debug: print(ipp.seq)
       # k is the other child
       if ipp.left == ip:
@@ -187,6 +195,7 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
       else:
         k = ipp.left
         ipp.left = i
+      # k.changed = True
       if ip.right == i:
         ip.right = k
       else:
@@ -211,7 +220,10 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
     ip = i.parent
     j = i.left
     k = i.right
-
+    # i.changed = True
+    # if ip != None: ip.changed = True
+    #j.changed = True
+    #k.changed = True
 
     dj = float('inf')
     dk = float('inf')
@@ -274,6 +286,7 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
 
 
   elif move_type==4: # Random walk
+    #tcpy.head.mark_tree()
     if debug: print("rates changed step", step )
     Q = 1 # symmetric
     def alter_rates(WINDOW_SIZE, vector, normalise=False):
@@ -385,15 +398,15 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
     chain1b.append(p1)
     chain1c.append((dcpy(alpha), dcpy(d), dcpy(D0), dcpy(B)))
     if i % 1000 == 0:
-      with open(currentdir + f"/csv/c{tstamp}a.csv", 'a+', newline = '') as csvfile:
+      with open(currentdir + f"/csv/c{tstamp}a.csv", 'w+', newline = '') as csvfile:
         my_writer = csv.writer(csvfile, delimiter = 'Y')
         my_writer.writerow(chain1a)
       csvfile.close()
-      with open(currentdir + f"/csv/c{tstamp}b.csv", 'a+', newline = '') as csvfile:
+      with open(currentdir + f"/csv/c{tstamp}b.csv", 'w+', newline = '') as csvfile:
         my_writer = csv.writer(csvfile, delimiter = 'Y')
         my_writer.writerow(chain1b)
       csvfile.close()
-      with open(currentdir + f"/csv/c{tstamp}c.csv", 'a+', newline = '') as csvfile:
+      with open(currentdir + f"/csv/c{tstamp}c.csv", 'w+', newline = '') as csvfile:
         my_writer = csv.writer(csvfile, delimiter = 'Y')
         my_writer.writerow(chain1c)
       csvfile.close()

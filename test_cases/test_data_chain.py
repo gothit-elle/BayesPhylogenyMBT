@@ -13,28 +13,37 @@ chaina = []
 chainb = []
 chainc = []
 
-i = 101
-with open(parentdir + f"/csv/c{i+1}a.csv", newline='') as f:
-	reader = csv.reader(f, delimiter='Y')
-	data = list(reader)
+
+import pandas as pd
+data = [] 
+i = "6201d47f12de48fbab3156d1c62562fc"
+# i = "c056e72282e340e797642326d209c601"
+with open(parentdir + f"/csv/c{i}a.csv", newline='') as f:
+	reader = pd.read_csv(f, delimiter='Y', header=None, skiprows=0)
+	for n, line in reader.iteritems():
+		data.append(line[0])
 chaina += data
-
-with open(parentdir + f"/csv/c{i+1}b.csv", newline='') as f:
+data = []
+with open(parentdir + f"/csv/c{i}b.csv", newline='') as f:
 	data= []
-	reader = csv.reader(f,  delimiter='Y')
-	for line in reader:
-		data.append([float(x) for x in line])
+	reader = pd.read_csv(f, delimiter='Y', header=None, skiprows=0)
+	for n, line in reader.iteritems():
+		data.append(float(line[0]))
 chainb += data
-
-with open(parentdir + f"/csv/c{i+1}c.csv", newline='') as f:
-	reader = csv.reader(f,  delimiter='Y')
-	data = list(reader)
+data = []
+print(chainb)
+with open(parentdir + f"/csv/c{i}c.csv", newline='') as f:
+	reader = pd.read_csv(f, delimiter='Y', header=None, skiprows=0)
+	for n, line in reader.iteritems():
+		data.append(line[0])
 chainc += data
 
 j = 0
-lst = chainb[j]
+lst = chainb
 ind = np.argmax(lst)
-s = chaina[j][ind]
+print(len(chainb))
+s = chaina[ind]
+print(s)
 t_cur = Tree(1)
 t_cur.str2tree(s,20,by='io')
 t_cur.disp()
@@ -43,32 +52,31 @@ s_ml = t_cur.head.to_newick()
 from ete3 import Tree as Tree_n
 t = Tree_n(s_ml, format = 3)
 # t.convert_to_ultrametric()
-# t.show()
+t.show()
 
 print('old tree')
 j = 0
-lst = chainb[j]
-s = chaina[j][0]
+lst = chainb
+s = chaina[0]
 t_cur = Tree(1)
 t_cur.str2tree(s,20,by='io')
 t_cur.disp()
 s_start = t_cur.head.to_newick()
-
 t2 = Tree_n(s_start, format = 3)
 # t2.convert_to_ultrametric()
-# t2.show()
+t2.show()
 
 # print(t.write(format = 5))
 ret = t.robinson_foulds(t2)
 rf, max_rf = ret[0:2]
 print(f"RF distance is {rf} over a total of {max_rf}")
 
-print("lik is: ", chainb[j][ind])
-print("params are: ", chainc[j][ind])
-print('initial lik was: ', chainb[j][0])
-print('initial params are: ', chainc[j][0])
-N = len(chainb[0])
-plt.plot(range(N), chainb[0])
+print("lik is: ", chainb[ind])
+print("params are: ", chainc[ind])
+print('initial lik was: ', chainb[0])
+print('initial params are: ', chainc[0])
+N = len(chainb)
+plt.plot(range(N), chainb)
 params = {'mathtext.default': 'regular' }
 plt.rcParams.update(params)
 plt.xlabel('Step')
