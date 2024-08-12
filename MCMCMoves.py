@@ -332,7 +332,7 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
 
   if tcpy.head.is_neg():
     return EXIT_FAILURE
-  return tcpy, Q, alpha_cpy, d_cpy, D0_cpy, B_cpy
+  return tcpy, Q, alpha_cpy, d_cpy, D0_cpy, B_cpy, move_type
   
 from decimal import *
 should_break = 0
@@ -347,10 +347,10 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
   else:
     t_cur = Tree(1)
     t_cur.str2tree(s,t,by=by)
-  t_cur.disp(log, fname)
-  p1 = tree_posterior(t_cur, alpha, d, D0, B, Q1, Pi, debug=False, fname = fname, multip=multip)
-  print(p1, file=fname)
-
+  #t_cur.disp(log, fname)
+  p1_t = tree_posterior(t_cur, alpha, d, D0, B, Q1, Pi, debug=False, fname = fname, multip=multip)
+  #print(p1, file=fname)
+  p1 = sum(p1_t)
 
   chain1a.append(t_cur.toStr())
   chain1b.append(p1)
@@ -362,12 +362,16 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
     p1 = chain1b[-1]
     if move != EXIT_FAILURE:
 
-      t_new, q_ratio, alpha_new, d_new, D0_new, B_new = move
+      t_new, q_ratio, alpha_new, d_new, D0_new, B_new, move_type = move
       # p1 = tree_posterior(t_cur, alpha, d, D0, B, Q1) # i dont need this right?
       if debug: print("operating on: ")
       if debug: t_new.disp()
-      p_new = tree_posterior(t_new, alpha_new, d_new, D0_new, B_new, Q1, Pi, log, fname, multip=multip)
-      
+      if move_type == 5: 
+	  # ranodm walk for params occurred, lik same
+        p_new_t[1] = tree_prior(t_new, alpha_new, d_new, D0_new, B_new, logit=True, fname=fname, multip=multip)
+      else:
+        p_new_t = tree_posterior(t_new, alpha_new, d_new, D0_new, B_new, Q1, Pi, log, fname, multip=multip)
+      p_new= sum(p_new_t)
       if p_new == 1:
         print("prev tree was: ", file=fname)
         t_cur.disp(log, fname=fname)

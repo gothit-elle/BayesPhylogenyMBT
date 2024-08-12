@@ -210,23 +210,24 @@ import uuid
 
 def target(s, N, t, Q1, alpha, d, D0, B, Pi, i, pos, multip):
 	tstamp = str(uuid.uuid4().hex)
+	print(tstamp)
 	#print(currentdir + '/csv/*')
 	#files = glob.glob(currentdir + '/csv/*')
 	#for f in files:
 	#	os.remove(f)
-	with open(parentdir + '/thesis_likelihood/logs/logr.txt', "w", encoding="utf-8") as f:
+	with open(currentdir + '/csv/logr.txt', "w+", encoding="utf-8") as f:
 		successes, chaina, chainb, chainc = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos, send_tree=False, multip=multip, tstamp = tstamp)
 
 	print("acceptance rate", successes/len(chaina))
-	with open(parentdir + f"/csv/c{i+1}a.csv", 'w+', newline = '') as csvfile:
+	with open(currentdir + f"/csv/c{i+1}a.csv", 'w+', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
 		my_writer.writerow(chaina)
 
-	with open(parentdir + f"/csv/c{i+1}b.csv", 'w+', newline = '') as csvfile:
+	with open(currentdir + f"/csv/c{i+1}b.csv", 'w+', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
 		my_writer.writerow(chainb)
 		
-	with open(parentdir + f"/csv/c{i+1}c.csv", 'w+', newline = '') as csvfile:
+	with open(currentdir + f"/csv/c{i+1}c.csv", 'w+', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
 		my_writer.writerow(chainc)
 		

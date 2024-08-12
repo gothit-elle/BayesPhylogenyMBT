@@ -1,6 +1,7 @@
 from num2words import num2words
 BASES = ["A","C", "G", "T"]
-# Tree data struct
+UNCHANGED = 0
+CHANGED = 1 
 
 class node:
   def __init__(self, seq, parent, time):
@@ -13,7 +14,7 @@ class node:
     self.map = None
     self.prior = None
     self.gval = None
-    self.changed = False
+    self.changed = CHANGED
 
   def __str__(self, level=0):
     #ret = "\t"*level+"time: " + repr(self.time)+' / '+repr(self.seq)+"\n" # original
@@ -34,7 +35,30 @@ class node:
 
   def __repr__(self):
     return '<tree rep>'
-    
+
+
+  def mark_c_sites(self, index):
+    # given an index, marks the seq sites which have changed since the last lik calc
+    if self.isLeaf(): # at a leaf node
+      if self.seq[index-1] == self.seq[index]:
+        self.changed = UNCHANGED
+      else:
+        self.changed = CHANGED
+    else:
+      res = 0
+      if self.right != None: 
+        self.right.mark_c_sites(index)
+        res += self.right.changed 
+      if self.left != None: 
+        self.left.mark_c_sites(index)
+        res += self.left.changed
+      if res  == UNCHANGED:
+        self.changed = UNCHANGED
+      else:
+        self.changed = CHANGED
+
+
+
   def is_neg(self):
     if self == None:
       return False
@@ -250,5 +274,3 @@ class node:
       leaf = leaves[i]
       leaf.map = f"Species{num2words(i).title()}"
 
-
-      

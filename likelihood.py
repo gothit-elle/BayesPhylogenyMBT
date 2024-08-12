@@ -2,6 +2,7 @@ from scipy.linalg import fractional_matrix_power, expm
 from multiprocessing import Pool, freeze_support, cpu_count
 from itertools import repeat
 import numpy as np
+
 BASES = ["A","C", "G", "T"]
 
 # if its a tip, have a 0 for all s except actaully observed
@@ -15,9 +16,8 @@ def prob(Q, sk, si, t): #sk, si, vi):
   result = sk@expm(Q*t)@si
   return result
 
-def cond_likelihood(tree, P, index, Pi, debug=False):
+def cond_likelihood(cur, P, index, Pi, debug=False):
   # calculates the likelihood of a tree given data (embedded in the struct)
-  cur=tree
 
   if cur.isLeaf(): # if leaf return obs
     if debug: print("leaf at", cur.seq, index)
@@ -26,10 +26,8 @@ def cond_likelihood(tree, P, index, Pi, debug=False):
       cur.lik = Pi
   else:
     # otherwise we want to sum across the leaves
-    if (cur.right is not None):
-      cur.right.lik = cond_likelihood(cur.right, P, index, Pi, debug)
-    if (cur.left is not None):
-      cur.left.lik = cond_likelihood(cur.left, P, index, Pi, debug)
+    cur.right.lik = cond_likelihood(cur.right, P, index, Pi, debug)
+    cur.left.lik = cond_likelihood(cur.left, P, index, Pi, debug)
     # we have the likelihoods.
     # pick a base:
     L = []
@@ -43,14 +41,19 @@ def cond_likelihood(tree, P, index, Pi, debug=False):
       L.append(left*right)
     cur.lik = L
   if debug: print("printing...", cur.seq, cur.time, cur.lik)
-  cur.changed = 0
   return cur.lik
 
 
 
 def sub_lik(k, new_tree, P, Pi, debug=False):
-  return np.log(sum([i*j for (i,j) in zip(Pi,cond_likelihood(new_tree.head, P, k, Pi, False))]))
-  
+  res = 0
+  for w in range(k,k+50):
+    #if w != k:
+    #  new_tree.head.mark_c_sites(w)
+    res += np.log(sum([i*j for (i,j) in zip(Pi,  cond_likelihood(new_tree.head, P, w, Pi, False))]))
+  return res
+ 
+
 def log_lik(new_tree, P, Pi, debug=False, multip=False):
   # returns the loglik of the tree
   new_tree.lik = 0
@@ -59,13 +62,12 @@ def log_lik(new_tree, P, Pi, debug=False, multip=False):
   if multip:
     if __name__ == 'likelihood':
       pool = Pool()
-      results = pool.starmap(sub_lik, zip(range(seq_len), repeat(new_tree), repeat(P), repeat(Pi)))
+      results = pool.starmap(sub_lik, zip(range(0,seq_len,50), repeat(new_tree), repeat(P), repeat(Pi)))
       pool.close()
+      new_tree.lik = sum(results)
   else: 
-    results = []
+
     for k in range(seq_len):
-      results.append(sub_lik(k, new_tree, P, Pi, debug))
-  #for k in range(seq_len):
-  #  new_tree.lik += sub_lik(k)
-  new_tree.lik = sum(results)
+      new_tree.lik += sub_lik(k, new_tree, P, Pi, debug)
+  
   return new_tree.lik

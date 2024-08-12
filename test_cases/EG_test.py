@@ -12,7 +12,7 @@ d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1
 
 E = get_E(5, alpha, d, D0, B)
 # should get E(5) = [0.2083, 0.3336]
-print(E)
+print('E is', E)
 
 debug = 0
 if debug:
@@ -20,7 +20,7 @@ if debug:
   print("\nG(b2,x2) is ", G_bkxk(1,17, alpha, d, D0, B))
   print("\nG(b2,x3) is ", G_bkxk(8,9, alpha, d, D0, B))
 
-plot = 0
+plot = 1
 if plot:
   scale=20
   alpha = np.array([0.5,0.5]).astype(object)

@@ -1,0 +1,414 @@
+
+The following have been reloaded with a version change:
+  1) zlib/1.2.12 => zlib/1.2.13
+
+
+The following have been reloaded with a version change:
+  1) Python/3.11.3 => Python/3.10.4     5) libreadline/8.2 => libreadline/8.1.2
+  2) SQLite/3.42.0 => SQLite/3.38.3     6) ncurses/6.4 => ncurses/6.3
+  3) Tcl/8.6.13 => Tcl/8.6.12           7) zlib/1.2.13 => zlib/1.2.12
+  4) libffi/3.4.4 => libffi/3.4.2
+
+Requirement already satisfied: pip in ./myenv/lib/python3.9/site-packages (24.2)
+Requirement already satisfied: numpy in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 1)) (2.0.1)
+Requirement already satisfied: ete3 in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 2)) (3.1.3)
+Requirement already satisfied: matplotlib in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 3)) (3.9.1)
+Requirement already satisfied: tqdm in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 4)) (4.66.4)
+Requirement already satisfied: scipy in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 5)) (1.13.1)
+Requirement already satisfied: num2words in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 6)) (0.5.13)
+Requirement already satisfied: PyQt5 in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 7)) (5.15.11)
+Requirement already satisfied: contourpy>=1.0.1 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (1.2.1)
+Requirement already satisfied: cycler>=0.10 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (4.53.1)
+Requirement already satisfied: kiwisolver>=1.3.1 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (1.4.5)
+Requirement already satisfied: packaging>=20.0 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (24.1)
+Requirement already satisfied: pillow>=8 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (10.4.0)
+Requirement already satisfied: pyparsing>=2.3.1 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (3.1.2)
+Requirement already satisfied: python-dateutil>=2.7 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (2.9.0.post0)
+Requirement already satisfied: importlib-resources>=3.2.0 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (6.4.0)
+Requirement already satisfied: docopt>=0.6.2 in ./myenv/lib/python3.9/site-packages (from num2words->-r requirements.txt (line 6)) (0.6.2)
+Requirement already satisfied: PyQt5-sip<13,>=12.15 in ./myenv/lib/python3.9/site-packages (from PyQt5->-r requirements.txt (line 7)) (12.15.0)
+Requirement already satisfied: PyQt5-Qt5<5.16.0,>=5.15.2 in ./myenv/lib/python3.9/site-packages (from PyQt5->-r requirements.txt (line 7)) (5.15.14)
+Requirement already satisfied: zipp>=3.1.0 in ./myenv/lib/python3.9/site-packages (from importlib-resources>=3.2.0->matplotlib->-r requirements.txt (line 3)) (3.19.2)
+Requirement already satisfied: six>=1.5 in ./myenv/lib/python3.9/site-packages (from python-dateutil>=2.7->matplotlib->-r requirements.txt (line 3)) (1.16.0)
+running code
+cpu_count is 128
+beginning simulations...
+1 ~ 'N' ~ 13.53
+	├──13.53 ~ 'SpeciesZero' ~ 0
+	└──0.9 ~ 'N' ~ 12.63
+		    ├──0.74 ~ 'N' ~ 11.89
+			      ├──11.89 ~ 'SpeciesOne' ~ 0
+			      └──0.78 ~ 'N' ~ 11.11
+				        ├──1.71 ~ 'N' ~ 9.41
+					          ├──9.41 ~ 'SpeciesTwo' ~ 0
+					          └──4.88 ~ 'N' ~ 4.53
+						            ├──4.53 ~ 'SpeciesThree' ~ 0
+						            └──4.53 ~ 'SpeciesFour' ~ 0
+				        └──4.93 ~ 'N' ~ 6.18
+					          ├──6.18 ~ 'SpeciesFive' ~ 0
+					          └──6.18 ~ 'SpeciesSix' ~ 0
+		    └──1.89 ~ 'N' ~ 10.74
+			      ├──0.15 ~ 'N' ~ 10.59
+				        ├──0.38 ~ 'N' ~ 10.21
+					          ├──3.79 ~ 'N' ~ 6.42
+						            ├──6.42 ~ 'SpeciesSeven' ~ 0
+						            └──6.42 ~ 'SpeciesEight' ~ 0
+					          └──4.92 ~ 'N' ~ 5.29
+						            ├──3.26 ~ 'N' ~ 2.03
+							              ├──2.03 ~ 'SpeciesNine' ~ 0
+							              └──2.03 ~ 'SpeciesTen' ~ 0
+						            └──4.42 ~ 'N' ~ 0.88
+							              ├──0.88 ~ 'SpeciesEleven' ~ 0
+							              └──0.88 ~ 'SpeciesTwelve' ~ 0
+				        └──0.42 ~ 'N' ~ 10.17
+					          ├──7.08 ~ 'N' ~ 3.08
+						            ├──3.08 ~ 'SpeciesThirteen' ~ 0
+						            └──3.08 ~ 'SpeciesFourteen' ~ 0
+					          └──10.17 ~ 'SpeciesFifteen' ~ 0
+			      └──2.03 ~ 'N' ~ 8.7
+				        ├──0.01 ~ 'N' ~ 8.69
+					          ├──6.03 ~ 'N' ~ 2.66
+						            ├──2.66 ~ 'SpeciesSixteen' ~ 0
+						            └──2.66 ~ 'SpeciesSeventeen' ~ 0
+					          └──1.11 ~ 'N' ~ 7.58
+						            ├──1.34 ~ 'N' ~ 6.25
+							              ├──2.48 ~ 'N' ~ 3.77
+								               ├──0.29 ~ 'N' ~ 3.48
+									                 ├──3.48 ~ 'SpeciesEighteen' ~ 0
+									                 └──0.07 ~ 'N' ~ 3.41
+										                   ├──0.1 ~ 'N' ~ 3.3
+											                     ├──0.95 ~ 'N' ~ 2.36
+												                      ├──2.36 ~ 'SpeciesNineteen' ~ 0
+												                      └──2.36 ~ 'SpeciesTwenty' ~ 0
+											                     └──3.3 ~ 'SpeciesTwenty-One' ~ 0
+										                   └──3.41 ~ 'SpeciesTwenty-Two' ~ 0
+								               └──3.77 ~ 'SpeciesTwenty-Three' ~ 0
+							              └──0.17 ~ 'N' ~ 6.08
+								               ├──0.11 ~ 'N' ~ 5.97
+									                 ├──0.18 ~ 'N' ~ 5.79
+										                   ├──0.08 ~ 'N' ~ 5.71
+											                     ├──5.71 ~ 'SpeciesTwenty-Four' ~ 0
+											                     └──0.4 ~ 'N' ~ 5.31
+												                      ├──0.34 ~ 'N' ~ 4.97
+													                        ├──4.97 ~ 'SpeciesTwenty-Five' ~ 0
+													                        └──0.82 ~ 'N' ~ 4.14
+														                          ├──4.14 ~ 'SpeciesTwenty-Six' ~ 0
+														                          └──4.14 ~ 'SpeciesTwenty-Seven' ~ 0
+												                      └──1.97 ~ 'N' ~ 3.34
+													                        ├──3.34 ~ 'SpeciesTwenty-Eight' ~ 0
+													                        └──3.34 ~ 'SpeciesTwenty-Nine' ~ 0
+										                   └──5.79 ~ 'SpeciesThirty' ~ 0
+									                 └──0.1 ~ 'N' ~ 5.87
+										                   ├──0.63 ~ 'N' ~ 5.24
+											                     ├──0.89 ~ 'N' ~ 4.35
+												                      ├──0.45 ~ 'N' ~ 3.9
+													                        ├──0.89 ~ 'N' ~ 3.01
+														                          ├──3.01 ~ 'SpeciesThirty-One' ~ 0
+														                          └──0.54 ~ 'N' ~ 2.46
+															                            ├──2.46 ~ 'SpeciesThirty-Two' ~ 0
+															                            └──0.96 ~ 'N' ~ 1.51
+																                              ├──1.51 ~ 'SpeciesThirty-Three' ~ 0
+																                              └──1.21 ~ 'N' ~ 0.3
+																	                                ├──0.3 ~ 'SpeciesThirty-Four' ~ 0
+																	                                └──0.3 ~ 'SpeciesThirty-Five' ~ 0
+													                        └──0.14 ~ 'N' ~ 3.75
+														                          ├──0.5 ~ 'N' ~ 3.25
+															                            ├──2.53 ~ 'N' ~ 0.72
+																                              ├──0.72 ~ 'SpeciesThirty-Six' ~ 0
+																                              └──0.72 ~ 'SpeciesThirty-Seven' ~ 0
+															                            └──0.08 ~ 'N' ~ 3.17
+																                              ├──3.17 ~ 'SpeciesThirty-Eight' ~ 0
+																                              └──0.4 ~ 'N' ~ 2.77
+																	                                ├──2.1 ~ 'N' ~ 0.67
+																		                                 ├──0.67 ~ 'SpeciesThirty-Nine' ~ 0
+																		                                 └──0.67 ~ 'SpeciesForty' ~ 0
+																	                                └──2.77 ~ 'SpeciesForty-One' ~ 0
+														                          └──1.62 ~ 'N' ~ 2.13
+															                            ├──2.13 ~ 'SpeciesForty-Two' ~ 0
+															                            └──2.13 ~ 'SpeciesForty-Three' ~ 0
+												                      └──4.35 ~ 'SpeciesForty-Four' ~ 0
+											                     └──1.07 ~ 'N' ~ 4.17
+												                      ├──4.17 ~ 'SpeciesForty-Five' ~ 0
+												                      └──0.9 ~ 'N' ~ 3.27
+													                        ├──0.11 ~ 'N' ~ 3.17
+														                          ├──1.23 ~ 'N' ~ 1.93
+															                            ├──0.61 ~ 'N' ~ 1.32
+																                              ├──1.32 ~ 'SpeciesForty-Six' ~ 0
+																                              └──1.32 ~ 'SpeciesForty-Seven' ~ 0
+															                            └──0.17 ~ 'N' ~ 1.76
+																                              ├──1.76 ~ 'SpeciesForty-Eight' ~ 0
+																                              └──1.76 ~ 'SpeciesForty-Nine' ~ 0
+														                          └──3.17 ~ 'SpeciesFifty' ~ 0
+													                        └──0.7 ~ 'N' ~ 2.57
+														                          ├──2.57 ~ 'SpeciesFifty-One' ~ 0
+														                          └──0.03 ~ 'N' ~ 2.55
+															                            ├──2.55 ~ 'SpeciesFifty-Two' ~ 0
+															                            └──1.07 ~ 'N' ~ 1.48
+																                              ├──1.48 ~ 'SpeciesFifty-Three' ~ 0
+																                              └──1.48 ~ 'SpeciesFifty-Four' ~ 0
+										                   └──0.26 ~ 'N' ~ 5.61
+											                     ├──1.16 ~ 'N' ~ 4.45
+												                      ├──3.39 ~ 'N' ~ 1.07
+													                        ├──1.07 ~ 'SpeciesFifty-Five' ~ 0
+													                        └──1.07 ~ 'SpeciesFifty-Six' ~ 0
+												                      └──4.45 ~ 'SpeciesFifty-Seven' ~ 0
+											                     └──0.47 ~ 'N' ~ 5.14
+												                      ├──0.64 ~ 'N' ~ 4.5
+													                        ├──2.42 ~ 'N' ~ 2.08
+														                          ├──2.08 ~ 'SpeciesFifty-Eight' ~ 0
+														                          └──2.08 ~ 'SpeciesFifty-Nine' ~ 0
+													                        └──3.57 ~ 'N' ~ 0.93
+														                          ├──0.93 ~ 'SpeciesSixty' ~ 0
+														                          └──0.93 ~ 'SpeciesSixty-One' ~ 0
+												                      └──5.14 ~ 'SpeciesSixty-Two' ~ 0
+								               └──4.41 ~ 'N' ~ 1.67
+									                 ├──1.67 ~ 'SpeciesSixty-Three' ~ 0
+									                 └──1.67 ~ 'SpeciesSixty-Four' ~ 0
+						            └──3.07 ~ 'N' ~ 4.51
+							              ├──4.51 ~ 'SpeciesSixty-Five' ~ 0
+							              └──4.51 ~ 'SpeciesSixty-Six' ~ 0
+				        └──8.7 ~ 'SpeciesSixty-Seven' ~ 0
+
+	generated tree with 68 nodes
+simulations done...
+starting MCMC chains...
+cpu_count is 128
+beginning simulations...
+1 ~ 'N' ~ 14.26
+	├──13.25 ~ 'N' ~ 1.01
+		    ├──1.01 ~ 'SpeciesZero' ~ 0
+		    └──1.01 ~ 'SpeciesOne' ~ 0
+	└──0.4 ~ 'N' ~ 13.86
+		    ├──0.68 ~ 'N' ~ 13.19
+			      ├──0.72 ~ 'N' ~ 12.47
+				        ├──0.4 ~ 'N' ~ 12.07
+					          ├──0.09 ~ 'N' ~ 11.97
+						            ├──11.97 ~ 'SpeciesTwo' ~ 0
+						            └──11.97 ~ 'SpeciesThree' ~ 0
+					          └──12.07 ~ 'SpeciesFour' ~ 0
+				        └──0.28 ~ 'N' ~ 12.19
+					          ├──0.51 ~ 'N' ~ 11.68
+						            ├──5.45 ~ 'N' ~ 6.24
+							              ├──6.24 ~ 'SpeciesFive' ~ 0
+							              └──2.75 ~ 'N' ~ 3.48
+								               ├──3.48 ~ 'SpeciesSix' ~ 0
+								               └──3.48 ~ 'SpeciesSeven' ~ 0
+						            └──0.37 ~ 'N' ~ 11.31
+							              ├──11.31 ~ 'SpeciesEight' ~ 0
+							              └──0.66 ~ 'N' ~ 10.65
+								               ├──0.8 ~ 'N' ~ 9.86
+									                 ├──1.31 ~ 'N' ~ 8.55
+										                   ├──8.55 ~ 'SpeciesNine' ~ 0
+										                   └──2.71 ~ 'N' ~ 5.83
+											                     ├──5.83 ~ 'SpeciesTen' ~ 0
+											                     └──0.04 ~ 'N' ~ 5.79
+												                      ├──5.19 ~ 'N' ~ 0.6
+													                        ├──0.6 ~ 'SpeciesEleven' ~ 0
+													                        └──0.6 ~ 'SpeciesTwelve' ~ 0
+												                      └──5.79 ~ 'SpeciesThirteen' ~ 0
+									                 └──0.67 ~ 'N' ~ 9.18
+										                   ├──0.81 ~ 'N' ~ 8.37
+											                     ├──0.15 ~ 'N' ~ 8.21
+												                      ├──6.54 ~ 'N' ~ 1.67
+													                        ├──1.65 ~ 'N' ~ 0.03
+														                          ├──0.03 ~ 'SpeciesFourteen' ~ 0
+														                          └──0.03 ~ 'SpeciesFifteen' ~ 0
+													                        └──1.67 ~ 'SpeciesSixteen' ~ 0
+												                      └──1.15 ~ 'N' ~ 7.06
+													                        ├──0.14 ~ 'N' ~ 6.92
+														                          ├──0.64 ~ 'N' ~ 6.29
+															                            ├──6.29 ~ 'SpeciesSeventeen' ~ 0
+															                            └──0.56 ~ 'N' ~ 5.73
+																                              ├──0.28 ~ 'N' ~ 5.45
+																	                                ├──0.24 ~ 'N' ~ 5.21
+																		                                 ├──5.21 ~ 'SpeciesEighteen' ~ 0
+																		                                 └──5.21 ~ 'SpeciesNineteen' ~ 0
+																	                                └──0.03 ~ 'N' ~ 5.42
+																		                                 ├──5.42 ~ 'SpeciesTwenty' ~ 0
+																		                                 └──5.42 ~ 'SpeciesTwenty-One' ~ 0
+																                              └──0.49 ~ 'N' ~ 5.24
+																	                                ├──5.24 ~ 'SpeciesTwenty-Two' ~ 0
+																	                                └──3.91 ~ 'N' ~ 1.33
+																		                                 ├──1.33 ~ 'SpeciesTwenty-Three' ~ 0
+																		                                 └──1.33 ~ 'SpeciesTwenty-Four' ~ 0
+														                          └──2.56 ~ 'N' ~ 4.36
+															                            ├──4.36 ~ 'SpeciesTwenty-Five' ~ 0
+															                            └──4.36 ~ 'SpeciesTwenty-Six' ~ 0
+													                        └──0.03 ~ 'N' ~ 7.03
+														                          ├──0.21 ~ 'N' ~ 6.82
+															                            ├──0.95 ~ 'N' ~ 5.87
+																                              ├──5.87 ~ 'SpeciesTwenty-Seven' ~ 0
+																                              └──0.06 ~ 'N' ~ 5.81
+																	                                ├──0.35 ~ 'N' ~ 5.47
+																		                                 ├──5.47 ~ 'SpeciesTwenty-Eight' ~ 0
+																		                                 └──0.79 ~ 'N' ~ 4.67
+																			                                   ├──3.6 ~ 'N' ~ 1.07
+																				                                     ├──1.07 ~ 'SpeciesTwenty-Nine' ~ 0
+																				                                     └──1.07 ~ 'SpeciesThirty' ~ 0
+																			                                   └──0.29 ~ 'N' ~ 4.39
+																				                                     ├──0.02 ~ 'N' ~ 4.36
+																					                                       ├──4.36 ~ 'SpeciesThirty-One' ~ 0
+																					                                       └──4.36 ~ 'SpeciesThirty-Two' ~ 0
+																				                                     └──4.39 ~ 'SpeciesThirty-Three' ~ 0
+																	                                └──0.26 ~ 'N' ~ 5.55
+																		                                 ├──5.55 ~ 'SpeciesThirty-Four' ~ 0
+																		                                 └──5.55 ~ 'SpeciesThirty-Five' ~ 0
+															                            └──6.82 ~ 'SpeciesThirty-Six' ~ 0
+														                          └──6.6 ~ 'N' ~ 0.43
+															                            ├──0.43 ~ 'SpeciesThirty-Seven' ~ 0
+															                            └──0.43 ~ 'SpeciesThirty-Eight' ~ 0
+											                     └──0.06 ~ 'N' ~ 8.3
+												                      ├──1.3 ~ 'N' ~ 7.0
+													                        ├──5.3 ~ 'N' ~ 1.7
+														                          ├──1.7 ~ 'SpeciesThirty-Nine' ~ 0
+														                          └──1.7 ~ 'SpeciesForty' ~ 0
+													                        └──7.0 ~ 'SpeciesForty-One' ~ 0
+												                      └──8.3 ~ 'SpeciesForty-Two' ~ 0
+										                   └──7.35 ~ 'N' ~ 1.83
+											                     ├──1.83 ~ 'SpeciesForty-Three' ~ 0
+											                     └──1.83 ~ 'SpeciesForty-Four' ~ 0
+								               └──10.65 ~ 'SpeciesForty-Five' ~ 0
+					          └──10.61 ~ 'N' ~ 1.58
+						            ├──1.58 ~ 'SpeciesForty-Six' ~ 0
+						            └──1.58 ~ 'SpeciesForty-Seven' ~ 0
+			      └──13.19 ~ 'SpeciesForty-Eight' ~ 0
+		    └──0.36 ~ 'N' ~ 13.5
+			      ├──13.5 ~ 'SpeciesForty-Nine' ~ 0
+			      └──10.48 ~ 'N' ~ 3.02
+				        ├──3.02 ~ 'SpeciesFifty' ~ 0
+				        └──3.02 ~ 'SpeciesFifty-One' ~ 0
+
+	generated tree with 52 nodes
+simulations done...
+starting MCMC chains...
+cpu_count is 128
+beginning simulations...
+1 ~ 'N' ~ 14.61
+	├──0.68 ~ 'N' ~ 13.92
+		    ├──0.02 ~ 'N' ~ 13.91
+			      ├──3.14 ~ 'N' ~ 10.77
+				        ├──0.9 ~ 'N' ~ 9.87
+					          ├──9.87 ~ 'SpeciesZero' ~ 0
+					          └──9.87 ~ 'SpeciesOne' ~ 0
+				        └──10.77 ~ 'SpeciesTwo' ~ 0
+			      └──0.06 ~ 'N' ~ 13.85
+				        ├──0.32 ~ 'N' ~ 13.53
+					          ├──6.21 ~ 'N' ~ 7.31
+						            ├──7.31 ~ 'SpeciesThree' ~ 0
+						            └──3.8 ~ 'N' ~ 3.52
+							              ├──3.52 ~ 'SpeciesFour' ~ 0
+							              └──3.52 ~ 'SpeciesFive' ~ 0
+					          └──13.53 ~ 'SpeciesSix' ~ 0
+				        └──13.85 ~ 'SpeciesSeven' ~ 0
+		    └──1.07 ~ 'N' ~ 12.85
+			      ├──0.57 ~ 'N' ~ 12.29
+				        ├──12.29 ~ 'SpeciesEight' ~ 0
+				        └──12.29 ~ 'SpeciesNine' ~ 0
+			      └──12.85 ~ 'SpeciesTen' ~ 0
+	└──0.05 ~ 'N' ~ 14.56
+		    ├──0.49 ~ 'N' ~ 14.06
+			      ├──0.7 ~ 'N' ~ 13.37
+				        ├──0.4 ~ 'N' ~ 12.97
+					          ├──4.41 ~ 'N' ~ 8.56
+						            ├──0.93 ~ 'N' ~ 7.63
+							              ├──7.63 ~ 'SpeciesEleven' ~ 0
+							              └──3.76 ~ 'N' ~ 3.86
+								               ├──3.86 ~ 'SpeciesTwelve' ~ 0
+								               └──3.86 ~ 'SpeciesThirteen' ~ 0
+						            └──5.65 ~ 'N' ~ 2.91
+							              ├──1.37 ~ 'N' ~ 1.55
+								               ├──1.55 ~ 'SpeciesFourteen' ~ 0
+								               └──1.55 ~ 'SpeciesFifteen' ~ 0
+							              └──2.91 ~ 'SpeciesSixteen' ~ 0
+					          └──7.68 ~ 'N' ~ 5.29
+						            ├──5.29 ~ 'SpeciesSeventeen' ~ 0
+						            └──5.29 ~ 'SpeciesEighteen' ~ 0
+				        └──0.55 ~ 'N' ~ 12.82
+					          ├──12.82 ~ 'SpeciesNineteen' ~ 0
+					          └──0.36 ~ 'N' ~ 12.46
+						            ├──5.4 ~ 'N' ~ 7.07
+							              ├──7.07 ~ 'SpeciesTwenty' ~ 0
+							              └──7.07 ~ 'SpeciesTwenty-One' ~ 0
+						            └──2.94 ~ 'N' ~ 9.53
+							              ├──0.18 ~ 'N' ~ 9.35
+								               ├──0.33 ~ 'N' ~ 9.02
+									                 ├──9.02 ~ 'SpeciesTwenty-Two' ~ 0
+									                 └──4.12 ~ 'N' ~ 4.9
+										                   ├──4.9 ~ 'SpeciesTwenty-Three' ~ 0
+										                   └──4.9 ~ 'SpeciesTwenty-Four' ~ 0
+								               └──0.05 ~ 'N' ~ 9.3
+									                 ├──1.9 ~ 'N' ~ 7.4
+										                   ├──7.4 ~ 'SpeciesTwenty-Five' ~ 0
+										                   └──7.4 ~ 'SpeciesTwenty-Six' ~ 0
+									                 └──0.74 ~ 'N' ~ 8.55
+										                   ├──0.21 ~ 'N' ~ 8.34
+											                     ├──0.03 ~ 'N' ~ 8.31
+												                      ├──0.26 ~ 'N' ~ 8.06
+													                        ├──0.02 ~ 'N' ~ 8.04
+														                          ├──8.04 ~ 'SpeciesTwenty-Seven' ~ 0
+														                          └──0.45 ~ 'N' ~ 7.59
+															                            ├──6.41 ~ 'N' ~ 1.17
+																                              ├──1.17 ~ 'SpeciesTwenty-Eight' ~ 0
+																                              └──1.17 ~ 'SpeciesTwenty-Nine' ~ 0
+															                            └──1.09 ~ 'N' ~ 6.5
+																                              ├──0.28 ~ 'N' ~ 6.21
+																	                                ├──0.66 ~ 'N' ~ 5.56
+																		                                 ├──0.03 ~ 'N' ~ 5.53
+																			                                   ├──5.53 ~ 'SpeciesThirty' ~ 0
+																			                                   └──1.54 ~ 'N' ~ 3.99
+																				                                     ├──3.99 ~ 'SpeciesThirty-One' ~ 0
+																				                                     └──0.26 ~ 'N' ~ 3.73
+																					                                       ├──0.91 ~ 'N' ~ 2.83
+																						                                        ├──2.83 ~ 'SpeciesThirty-Two' ~ 0
+																						                                        └──2.83 ~ 'SpeciesThirty-Three' ~ 0
+																					                                       └──3.73 ~ 'SpeciesThirty-Four' ~ 0
+																		                                 └──5.56 ~ 'SpeciesThirty-Five' ~ 0
+																	                                └──5.69 ~ 'N' ~ 0.52
+																		                                 ├──0.42 ~ 'N' ~ 0.1
+																			                                   ├──0.1 ~ 'SpeciesThirty-Six' ~ 0
+																			                                   └──0.1 ~ 'SpeciesThirty-Seven' ~ 0
+																		                                 └──0.52 ~ 'SpeciesThirty-Eight' ~ 0
+																                              └──6.5 ~ 'SpeciesThirty-Nine' ~ 0
+													                        └──0.57 ~ 'N' ~ 7.48
+														                          ├──7.48 ~ 'SpeciesForty' ~ 0
+														                          └──7.48 ~ 'SpeciesForty-One' ~ 0
+												                      └──0.5 ~ 'N' ~ 7.81
+													                        ├──7.81 ~ 'SpeciesForty-Two' ~ 0
+													                        └──7.81 ~ 'SpeciesForty-Three' ~ 0
+											                     └──7.14 ~ 'N' ~ 1.21
+												                      ├──0.56 ~ 'N' ~ 0.64
+													                        ├──0.64 ~ 'SpeciesForty-Four' ~ 0
+													                        └──0.64 ~ 'SpeciesForty-Five' ~ 0
+												                      └──1.21 ~ 'SpeciesForty-Six' ~ 0
+										                   └──8.55 ~ 'SpeciesForty-Seven' ~ 0
+							              └──3.16 ~ 'N' ~ 6.37
+								               ├──0.13 ~ 'N' ~ 6.24
+									                 ├──0.48 ~ 'N' ~ 5.76
+										                   ├──0.16 ~ 'N' ~ 5.59
+											                     ├──5.59 ~ 'SpeciesForty-Eight' ~ 0
+											                     └──0.1 ~ 'N' ~ 5.49
+												                      ├──5.49 ~ 'SpeciesForty-Nine' ~ 0
+												                      └──5.49 ~ 'SpeciesFifty' ~ 0
+										                   └──5.76 ~ 'SpeciesFifty-One' ~ 0
+									                 └──6.24 ~ 'SpeciesFifty-Two' ~ 0
+								               └──6.37 ~ 'SpeciesFifty-Three' ~ 0
+			      └──0.54 ~ 'N' ~ 13.53
+				        ├──13.53 ~ 'SpeciesFifty-Four' ~ 0
+				        └──13.53 ~ 'SpeciesFifty-Five' ~ 0
+		    └──1.41 ~ 'N' ~ 13.15
+			      ├──0.25 ~ 'N' ~ 12.9
+				        ├──12.9 ~ 'SpeciesFifty-Six' ~ 0
+				        └──12.9 ~ 'SpeciesFifty-Seven' ~ 0
+			      └──9.53 ~ 'N' ~ 3.62
+				        ├──3.62 ~ 'SpeciesFifty-Eight' ~ 0
+				        └──3.62 ~ 'SpeciesFifty-Nine' ~ 0
+
+	generated tree with 60 nodes
+simulations done...
+starting MCMC chains...
+
+
+ 51%|█████     | 5062/10000 [168:47:10<165:13:56, 120.46s/it][A
+ 67%|██████▋   | 6705/10000 [168:49:32<154:46:53, 169.11s/it][A
+ 43%|████▎     | 4295/10000 [168:47:33<347:17:10, 219.15s/it][A

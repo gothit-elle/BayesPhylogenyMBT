@@ -86,7 +86,8 @@ def G_bkxk(z,x, alpha, d, D0, B, plot=0):
       # print("2nd E is ", x_sol.y[0:2, -1])
       # print("D^(1) is ", x_sol.y[2:4, -1])
       return (x_sol.y[2:4,:], x_sol.t)
-    ee, ts = get_D1h(z, d, D0, B)
+    print("x+z is", z+x)
+    ee, ts = get_D1h(z+x, d, D0, B)
     plt.plot(dataG.t, dataG.y[0,:]+dataG.y[1,:] ,'m-', dataG.t, dataG.y[2,:]+dataG.y[3,:], 'r-', ts, ee[0], 'c--', ts, ee[1], 'b--')
     params = {'mathtext.default': 'regular' }
     plt.rcParams.update(params)

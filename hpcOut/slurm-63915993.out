@@ -1,0 +1,166 @@
+
+The following have been reloaded with a version change:
+  1) zlib/1.2.12 => zlib/1.2.13
+
+
+The following have been reloaded with a version change:
+  1) Python/3.11.3 => Python/3.10.4     5) libreadline/8.2 => libreadline/8.1.2
+  2) SQLite/3.42.0 => SQLite/3.38.3     6) ncurses/6.4 => ncurses/6.3
+  3) Tcl/8.6.13 => Tcl/8.6.12           7) zlib/1.2.13 => zlib/1.2.12
+  4) libffi/3.4.4 => libffi/3.4.2
+
+Requirement already satisfied: pip in ./myenv/lib/python3.9/site-packages (24.2)
+Requirement already satisfied: numpy in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 1)) (2.0.1)
+Requirement already satisfied: ete3 in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 2)) (3.1.3)
+Requirement already satisfied: matplotlib in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 3)) (3.9.1)
+Requirement already satisfied: tqdm in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 4)) (4.66.4)
+Requirement already satisfied: scipy in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 5)) (1.13.1)
+Requirement already satisfied: num2words in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 6)) (0.5.13)
+Requirement already satisfied: PyQt5 in ./myenv/lib/python3.9/site-packages (from -r requirements.txt (line 7)) (5.15.11)
+Requirement already satisfied: contourpy>=1.0.1 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (1.2.1)
+Requirement already satisfied: cycler>=0.10 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (4.53.1)
+Requirement already satisfied: kiwisolver>=1.3.1 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (1.4.5)
+Requirement already satisfied: packaging>=20.0 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (24.1)
+Requirement already satisfied: pillow>=8 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (10.4.0)
+Requirement already satisfied: pyparsing>=2.3.1 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (3.1.2)
+Requirement already satisfied: python-dateutil>=2.7 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (2.9.0.post0)
+Requirement already satisfied: importlib-resources>=3.2.0 in ./myenv/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 3)) (6.4.0)
+Requirement already satisfied: docopt>=0.6.2 in ./myenv/lib/python3.9/site-packages (from num2words->-r requirements.txt (line 6)) (0.6.2)
+Requirement already satisfied: PyQt5-sip<13,>=12.15 in ./myenv/lib/python3.9/site-packages (from PyQt5->-r requirements.txt (line 7)) (12.15.0)
+Requirement already satisfied: PyQt5-Qt5<5.16.0,>=5.15.2 in ./myenv/lib/python3.9/site-packages (from PyQt5->-r requirements.txt (line 7)) (5.15.14)
+Requirement already satisfied: zipp>=3.1.0 in ./myenv/lib/python3.9/site-packages (from importlib-resources>=3.2.0->matplotlib->-r requirements.txt (line 3)) (3.19.2)
+Requirement already satisfied: six>=1.5 in ./myenv/lib/python3.9/site-packages (from python-dateutil>=2.7->matplotlib->-r requirements.txt (line 3)) (1.16.0)
+running code
+cpu_count is 128
+beginning simulations...
+1 ~ 'N' ~ 14.78
+	├──0.04 ~ 'N' ~ 14.74
+		    ├──14.74 ~ 'SpeciesZero' ~ 0
+		    └──14.74 ~ 'SpeciesOne' ~ 0
+	└──0.01 ~ 'N' ~ 14.77
+		    ├──4.35 ~ 'N' ~ 10.42
+			      ├──1.03 ~ 'N' ~ 9.38
+				        ├──0.76 ~ 'N' ~ 8.62
+					          ├──1.69 ~ 'N' ~ 6.93
+						            ├──6.93 ~ 'SpeciesTwo' ~ 0
+						            └──6.93 ~ 'SpeciesThree' ~ 0
+					          └──8.62 ~ 'SpeciesFour' ~ 0
+				        └──0.68 ~ 'N' ~ 8.7
+					          ├──0.02 ~ 'N' ~ 8.68
+						            ├──0.35 ~ 'N' ~ 8.32
+							              ├──2.26 ~ 'N' ~ 6.06
+								               ├──0.65 ~ 'N' ~ 5.41
+									                 ├──1.12 ~ 'N' ~ 4.29
+										                   ├──4.29 ~ 'SpeciesFive' ~ 0
+										                   └──4.29 ~ 'SpeciesSix' ~ 0
+									                 └──5.41 ~ 'SpeciesSeven' ~ 0
+								               └──0.22 ~ 'N' ~ 5.85
+									                 ├──5.85 ~ 'SpeciesEight' ~ 0
+									                 └──5.85 ~ 'SpeciesNine' ~ 0
+							              └──1.5 ~ 'N' ~ 6.82
+								               ├──0.28 ~ 'N' ~ 6.54
+									                 ├──0.86 ~ 'N' ~ 5.68
+										                   ├──5.68 ~ 'SpeciesTen' ~ 0
+										                   └──0.63 ~ 'N' ~ 5.05
+											                     ├──5.05 ~ 'SpeciesEleven' ~ 0
+											                     └──5.05 ~ 'SpeciesTwelve' ~ 0
+									                 └──4.96 ~ 'N' ~ 1.58
+										                   ├──1.58 ~ 'SpeciesThirteen' ~ 0
+										                   └──0.62 ~ 'N' ~ 0.96
+											                     ├──0.96 ~ 'SpeciesFourteen' ~ 0
+											                     └──0.96 ~ 'SpeciesFifteen' ~ 0
+								               └──2.24 ~ 'N' ~ 4.58
+									                 ├──0.27 ~ 'N' ~ 4.3
+										                   ├──4.3 ~ 'SpeciesSixteen' ~ 0
+										                   └──4.3 ~ 'SpeciesSeventeen' ~ 0
+									                 └──0.45 ~ 'N' ~ 4.13
+										                   ├──4.13 ~ 'SpeciesEighteen' ~ 0
+										                   └──0.52 ~ 'N' ~ 3.61
+											                     ├──0.18 ~ 'N' ~ 3.42
+												                      ├──3.42 ~ 'SpeciesNineteen' ~ 0
+												                      └──2.9 ~ 'N' ~ 0.53
+													                        ├──0.53 ~ 'SpeciesTwenty' ~ 0
+													                        └──0.53 ~ 'SpeciesTwenty-One' ~ 0
+											                     └──0.48 ~ 'N' ~ 3.13
+												                      ├──3.13 ~ 'SpeciesTwenty-Two' ~ 0
+												                      └──3.13 ~ 'SpeciesTwenty-Three' ~ 0
+						            └──8.68 ~ 'SpeciesTwenty-Four' ~ 0
+					          └──0.11 ~ 'N' ~ 8.59
+						            ├──1.01 ~ 'N' ~ 7.58
+							              ├──0.04 ~ 'N' ~ 7.54
+								               ├──0.46 ~ 'N' ~ 7.08
+									                 ├──0.98 ~ 'N' ~ 6.11
+										                   ├──6.11 ~ 'SpeciesTwenty-Five' ~ 0
+										                   └──6.11 ~ 'SpeciesTwenty-Six' ~ 0
+									                 └──6.46 ~ 'N' ~ 0.63
+										                   ├──0.63 ~ 'SpeciesTwenty-Seven' ~ 0
+										                   └──0.63 ~ 'SpeciesTwenty-Eight' ~ 0
+								               └──7.54 ~ 'SpeciesTwenty-Nine' ~ 0
+							              └──7.44 ~ 'N' ~ 0.14
+								               ├──0.14 ~ 'SpeciesThirty' ~ 0
+								               └──0.14 ~ 'SpeciesThirty-One' ~ 0
+						            └──2.41 ~ 'N' ~ 6.18
+							              ├──1.89 ~ 'N' ~ 4.29
+								               ├──4.29 ~ 'SpeciesThirty-Two' ~ 0
+								               └──4.29 ~ 'SpeciesThirty-Three' ~ 0
+							              └──0.98 ~ 'N' ~ 5.2
+								               ├──5.2 ~ 'SpeciesThirty-Four' ~ 0
+								               └──0.46 ~ 'N' ~ 4.74
+									                 ├──0.11 ~ 'N' ~ 4.63
+										                   ├──0.06 ~ 'N' ~ 4.58
+											                     ├──0.09 ~ 'N' ~ 4.49
+												                      ├──0.99 ~ 'N' ~ 3.5
+													                        ├──3.5 ~ 'SpeciesThirty-Five' ~ 0
+													                        └──0.65 ~ 'N' ~ 2.85
+														                          ├──2.85 ~ 'SpeciesThirty-Six' ~ 0
+														                          └──1.16 ~ 'N' ~ 1.69
+															                            ├──1.69 ~ 'SpeciesThirty-Seven' ~ 0
+															                            └──1.69 ~ 'SpeciesThirty-Eight' ~ 0
+												                      └──1.06 ~ 'N' ~ 3.43
+													                        ├──1.67 ~ 'N' ~ 1.76
+														                          ├──1.76 ~ 'SpeciesThirty-Nine' ~ 0
+														                          └──0.91 ~ 'N' ~ 0.85
+															                            ├──0.85 ~ 'SpeciesForty' ~ 0
+															                            └──0.85 ~ 'SpeciesForty-One' ~ 0
+													                        └──3.43 ~ 'SpeciesForty-Two' ~ 0
+											                     └──1.06 ~ 'N' ~ 3.51
+												                      ├──3.51 ~ 'SpeciesForty-Three' ~ 0
+												                      └──2.72 ~ 'N' ~ 0.8
+													                        ├──0.8 ~ 'SpeciesForty-Four' ~ 0
+													                        └──0.8 ~ 'SpeciesForty-Five' ~ 0
+										                   └──4.63 ~ 'SpeciesForty-Six' ~ 0
+									                 └──0.65 ~ 'N' ~ 4.09
+										                   ├──2.97 ~ 'N' ~ 1.12
+											                     ├──0.91 ~ 'N' ~ 0.21
+												                      ├──0.21 ~ 'SpeciesForty-Seven' ~ 0
+												                      └──0.21 ~ 'SpeciesForty-Eight' ~ 0
+											                     └──1.12 ~ 'SpeciesForty-Nine' ~ 0
+										                   └──2.18 ~ 'N' ~ 1.91
+											                     ├──1.91 ~ 'SpeciesFifty' ~ 0
+											                     └──1.91 ~ 'SpeciesFifty-One' ~ 0
+			      └──10.42 ~ 'SpeciesFifty-Two' ~ 0
+		    └──0.13 ~ 'N' ~ 14.64
+			      ├──8.52 ~ 'N' ~ 6.11
+				        ├──4.07 ~ 'N' ~ 2.04
+					          ├──2.04 ~ 'SpeciesFifty-Three' ~ 0
+					          └──2.04 ~ 'SpeciesFifty-Four' ~ 0
+				        └──3.06 ~ 'N' ~ 3.05
+					          ├──3.05 ~ 'SpeciesFifty-Five' ~ 0
+					          └──2.03 ~ 'N' ~ 1.02
+						            ├──1.02 ~ 'SpeciesFifty-Six' ~ 0
+						            └──1.02 ~ 'SpeciesFifty-Seven' ~ 0
+			      └──0.35 ~ 'N' ~ 14.28
+				        ├──0.21 ~ 'N' ~ 14.08
+					          ├──14.08 ~ 'SpeciesFifty-Eight' ~ 0
+					          └──9.41 ~ 'N' ~ 4.67
+						            ├──4.67 ~ 'SpeciesFifty-Nine' ~ 0
+						            └──4.67 ~ 'SpeciesSixty' ~ 0
+				        └──14.28 ~ 'SpeciesSixty-One' ~ 0
+
+	generated tree with 62 nodes
+simulations done...
+starting MCMC chains...
+
+
+ 79%|███████▉  | 11819/15000 [34:06:02<9:40:06, 10.94s/it][A

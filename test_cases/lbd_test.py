@@ -7,6 +7,7 @@ from nodestruct import *
 from prior import *
 from buildmtrx import *
 from MCMCMoves import *
+from math import factorial
 
 """# Hiding Linear birth death model
 
@@ -24,44 +25,20 @@ t2.disp()
 
 def lin_bd_lik(lambda0, mu0, tree):
   cur = tree.head
-  n = len(cur.find_leaves())
-  def log_int_f(lambda0, mu0, node):
-    log_int_f.counter += 1 # track number of calls
-    tl = node.time
-    tt = node.dist_from_tip()
-    tb = tl + tt
-    d = lambda0-mu0
-
-    num = (lambda0-mu0*np.exp(-d*tt))**2
-    denom = (lambda0-mu0*np.exp(-d*tb))**2
-
-    #print("counter: ", log_int_f.counter)
-    #print(num, denom)
-    return -d*tl + np.log(num) - np.log(denom)
-  log_int_f.counter = 0
-  def recurse(lambda0, mu0, cur):
-    llik = 0
-    if cur == None:
-      return llik
-    else:
-      #print(cur.seq)
-      llik = log_int_f(lambda0, mu0, cur)
-      llik += recurse(lambda0, mu0, cur.right) + recurse(lambda0, mu0, cur.left)
-    return llik
-  llik = recurse(lambda0, mu0, cur)
-
-  plik = (n)*np.log(lambda0)+llik
-
-  d = lambda0-mu0
-  Et_root = 1 - d/(lambda0 -mu0*np.exp(-d*tree.obs_time))
-
-  num2 = np.log(np.math.factorial(n-1))
-  denom2 = np.log(lambda0*(1-Et_root)**2)
-
-  adj = plik+num2-denom2
-  # print("\t\tplik-denom", plik-denom2)
-
-  #print(num2, denom2)
+  r = lambda0-mu0
+  a = mu0/lambda0
+  leaves = cur.find_leaves()
+  n = len(leaves)
+  adj = 0
+  parents = cur.right.find_parents() + cur.left.find_parents()
+  sum1 = 0
+  prod1 = 1
+  for node in parents +leaves:
+    sum1 += node.dist_from_tip()
+  for node in parents+leaves+[cur]:
+    x = node.dist_from_tip()
+    prod1 *= 1/(np.exp(r*x)-a)**2
+  adj = factorial(n-1)*r**(n-2)*np.exp(r*sum)*(1-a)**n*prod1
   return adj
 lin_bd_lik(lambda0, mu0, t2)
 

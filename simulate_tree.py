@@ -31,14 +31,14 @@ if __name__ == '__main__':
 	random.seed(26111994)
 	print("beginning simulations...")
 	#for i in range(3):
-	t1 = sim_tree(alpha, D0, d, B, Q1, Pi, stopping_time, min_leaves = 50, seq_len = 500)
+	t1 = sim_tree(alpha, D0, d, B, Q1, Pi, stopping_time, min_leaves = 40, seq_len = 1000)
 	t1.disp()
 	print(f"\tgenerated tree with {len(t1.head.find_leaves())} nodes")
 	print("simulations done...")
 	print("starting MCMC chains...")
 	t1 #, t2, t3 = trees
 	multiprocessing.freeze_support()
-	N = 10000
+	N = 15000
 	t = t1.obs_time
 	# t1.disp()
 	str1 = t1.toStr()

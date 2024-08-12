@@ -4,7 +4,7 @@ import re
 from nodestruct import *
 
 class Tree:
-  def __init__(self, seq_len = 0):
+  def __init__(self, seq_len = 1):
     self.head = None
     self.lik = None
     self.seq_len = seq_len
