@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=72
-#SBATCH --time=7-24:00:00
+#SBATCH --time=4-24:00:00
 
 # Load required modules
 module purge

@@ -5,38 +5,7 @@ from treestruct import *
 from nodestruct import *
 from prior import *
 from buildmtrx import *
-
-alpha = np.array([0.5,0.5]).astype(object)
-d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
-
-"""# tests
-
-Tree from example 1 of paper
-"""
-
-plot = 0
-new_tree = Tree(1)
-alpha = np.array([0.5,0.5]).astype(object)
-d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
-b1 = 2
-b2 = 1
-b3 = 8
-b3h = x2 = 17
-b4h = x1 = 18
-x3 = b1h = b2h = 9
-new_tree.head = node("T", None, b1)
-new_tree.head.right = node("C", new_tree.head, b4h)
-new_tree.head.left = node("G", new_tree.head, b2)
-new_tree.head.left.right = node("T", new_tree.head.left, b3)
-new_tree.head.left.left = node("A", new_tree.head.left, b3h)
-new_tree.head.left.right.right = node("T", new_tree.head.left,b1h)
-new_tree.head.left.right.left = node("T", new_tree.head.left, b2h)
-new_tree.disp()
-print("the tree prior is")
-lik = tree_prior(new_tree, alpha, d, D0, B)
-print(lik)
-
-""""by hand" method on page 16 of paper"""
+from multiprocessing import freeze_support
 
 def get_D1h(b):
   def f(state, t, d, D0, B):
@@ -62,6 +31,54 @@ def get_D1h(b):
     plt.legend(["E$_0$(t)", "E$_1$(t)", "D$^{(1)}$$_0$(t)", "D$^{(1)}$$_1$(t)"], loc="upper right")
   return np.array(x_sol[-1,2:4]).astype(object) # need to return D_1 at time bm_hat
   # TODO: double check getting to the right index
+
+if __name__ == '__main__':
+	alpha = np.array([0.5,0.5]).astype(object)
+	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
+
+
+	plot = 0
+	new_tree = Tree(1)
+	alpha = np.array([0.5,0.5]).astype(object)
+	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
+	b1 = 2
+	b2 = 1
+	b3 = 8
+	b3h = x2 = 17
+	b4h = x1 = 18
+	x3 = b1h = b2h = 9
+	new_tree.head = node("T", None, b1)
+	new_tree.head.right = node("C", new_tree.head, b4h)
+	new_tree.head.left = node("G", new_tree.head, b2)
+	new_tree.head.left.right = node("T", new_tree.head.left, b3)
+	new_tree.head.left.left = node("A", new_tree.head.left, b3h)
+	new_tree.head.left.right.right = node("T", new_tree.head.left,b1h)
+	new_tree.head.left.right.left = node("T", new_tree.head.left, b2h)
+	new_tree.disp()
+
+	liks = [0,0,0,0]
+	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
+	liks[0] = tree_prior(new_tree,alpha, d, D0, B, True, None, True)
+
+
+	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1 = 0.1, q01 = 0.9, q10 =0.001, lambda0 = 0.3, lambda1 = 0.099)
+	liks[1] = tree_prior(new_tree,alpha, d, D0, B, True, None, True)
+
+	d, D0, D1, B = build_mtrx(mu0= 0.999, mu1 = 0.099, q01 = 0.2, q10 =0.001, lambda0 = 1, lambda1 = 1)
+	liks[2] = tree_prior(new_tree,alpha, d, D0, B, True, None, True)
+
+	d, D0, D1, B = build_mtrx(mu0= 0.2, mu1 = 0.099, q01 = 0.2, q10 =0.001, lambda0 = 1, lambda1 = 1)
+	liks[3] = tree_prior(new_tree,alpha, d, D0, B, True, None, True)
+	
+	print("the tree priors are")
+	print(liks)
+
+"""
+print("the tree prior is")
+lik = tree_prior(new_tree, alpha, d, D0, B)
+print(lik)
+
+#"by hand" method on page 16 of paper
 
 
 
@@ -122,22 +139,6 @@ print(p4)
 p5 = alpha@G_bkxk(b1, x1, alpha, d, D0, B)@D1@(p4)
 print(np.log(2*p5))
 
+"""
 
 
-# both answers agree
-liks = [0,0,0,0]
-d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
-liks[0] = tree_prior(new_tree,alpha, d, D0, B)
-
-
-d, D0, D1, B = build_mtrx(mu0= 0.1, mu1 = 0.1, q01 = 0.9, q10 =0.001, lambda0 = 0.3, lambda1 = 0.099)
-liks[1] = tree_prior(new_tree,alpha, d, D0, B)
-
-d, D0, D1, B = build_mtrx(mu0= 0.999, mu1 = 0.099, q01 = 0.2, q10 =0.001, lambda0 = 1, lambda1 = 1)
-liks[2] = tree_prior(new_tree,alpha, d, D0, B)
-
-d, D0, D1, B = build_mtrx(mu0= 0.2, mu1 = 0.099, q01 = 0.2, q10 =0.001, lambda0 = 1, lambda1 = 1)
-liks[3] = tree_prior(new_tree,alpha, d, D0, B)
-
-print("the tree priors are")
-print(liks)

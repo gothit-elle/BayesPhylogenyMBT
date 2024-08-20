@@ -289,6 +289,7 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
     #tcpy.head.mark_tree()
     if debug: print("rates changed step", step )
     Q = 1 # symmetric
+	
     def alter_rates(WINDOW_SIZE, vector, normalise=False):
       for i in range(len(vector)):
         delta = np.random.uniform(-WINDOW_SIZE, WINDOW_SIZE)
@@ -299,7 +300,7 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
       if debug: print("vector is", vector)
       return vector
 
-    randnum = np.random.choice(4)
+    randnum = np.random.choice(3) # 3 here prevents birth rates from changing
     v = np.array([D0_cpy[0,1], D0_cpy[1,0]]).astype(object)
 
     if randnum == 0:
@@ -357,7 +358,7 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
   chain1c.append((dcpy(alpha), dcpy(d), dcpy(D0), dcpy(B)))
 
   successes = 0
-  for i in tqdm(range(N), position = pos):
+  for i in tqdm(range(N), position=pos):
     move = propose_move(t_cur, alpha, d, D0, B, i)
     p1 = chain1b[-1]
     if move != EXIT_FAILURE:
@@ -401,16 +402,16 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
     chain1a.append(t_cur.toStr())
     chain1b.append(p1)
     chain1c.append((dcpy(alpha), dcpy(d), dcpy(D0), dcpy(B)))
-    if i % 1000 == 0:
-      with open(currentdir + f"/csv/c{tstamp}a.csv", 'w+', newline = '') as csvfile:
+    if i % 14900 == 0:
+      with open(currentdir + f"/csv/{tstamp}_a.csv", 'w+', newline = '') as csvfile:
         my_writer = csv.writer(csvfile, delimiter = 'Y')
         my_writer.writerow(chain1a)
       csvfile.close()
-      with open(currentdir + f"/csv/c{tstamp}b.csv", 'w+', newline = '') as csvfile:
+      with open(currentdir + f"/csv/{tstamp}_b.csv", 'w+', newline = '') as csvfile:
         my_writer = csv.writer(csvfile, delimiter = 'Y')
         my_writer.writerow(chain1b)
       csvfile.close()
-      with open(currentdir + f"/csv/c{tstamp}c.csv", 'w+', newline = '') as csvfile:
+      with open(currentdir + f"/csv/{tstamp}_c.csv", 'w+', newline = '') as csvfile:
         my_writer = csv.writer(csvfile, delimiter = 'Y')
         my_writer.writerow(chain1c)
       csvfile.close()

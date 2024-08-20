@@ -8,6 +8,8 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
 import numpy as np
 from treestruct import *
+from posterior import *
+from buildmtrx import *
 
 chaina = []
 chainb = []
@@ -16,25 +18,25 @@ chainc = []
 
 import pandas as pd
 data = [] 
-i = "6201d47f12de48fbab3156d1c62562fc"
-# i = "c056e72282e340e797642326d209c601"
+i = "c056e72282e340e797642326d209c601"
+# i = "c056e72282e340e797642326d209c601" #this reqs skip rows
 with open(parentdir + f"/csv/c{i}a.csv", newline='') as f:
-	reader = pd.read_csv(f, delimiter='Y', header=None, skiprows=0)
-	for n, line in reader.iteritems():
+	reader = pd.read_csv(f, delimiter='Y', header=None, skiprows=9)
+	for n, line in reader.items():
 		data.append(line[0])
 chaina += data
 data = []
 with open(parentdir + f"/csv/c{i}b.csv", newline='') as f:
 	data= []
-	reader = pd.read_csv(f, delimiter='Y', header=None, skiprows=0)
-	for n, line in reader.iteritems():
+	reader = pd.read_csv(f, delimiter='Y', header=None, skiprows=8)
+	for n, line in reader.items():
 		data.append(float(line[0]))
 chainb += data
 data = []
-print(chainb)
+
 with open(parentdir + f"/csv/c{i}c.csv", newline='') as f:
-	reader = pd.read_csv(f, delimiter='Y', header=None, skiprows=0)
-	for n, line in reader.iteritems():
+	reader = pd.read_csv(f, delimiter='Y', header=None, skiprows=8)
+	for n, line in reader.items():
 		data.append(line[0])
 chainc += data
 
@@ -73,6 +75,29 @@ print(f"RF distance is {rf} over a total of {max_rf}")
 
 print("lik is: ", chainb[ind])
 print("params are: ", chainc[ind])
+
+
+alpha = np.array([0.9705533474125201, 0.02944665258747998]).astype(object)
+d, D0, D1, B = build_mtrx(mu0= 0.2977797601236012, mu1=0.1493045447617091, q01 =  0.7728589418470766, q10 =0.017171938988586648, lambda0 = 1, lambda1 = 0.099)
+s = chaina[ind]
+t_cur = Tree(1)
+t_cur.str2tree(s,20,by='io')
+
+# we start a tree
+# relative rates matrix
+R = np.array([0, 0.5, 2, 0.5,
+			  0.5, 0, 0.5, 2,
+			  2, 0.5, 0, 0.5,
+			  0.5, 2, 0.5, 0]).reshape(4,4)
+# initial distribution
+Pi = [0.295, 0.205, 0.205, 0.295]
+# rate matrix
+Q1 = R@np.diag(Pi)
+# need to adjust so rows sum to 0
+Q1 -= np.diag(Q1@np.ones(4))
+
+	
+print(tree_posterior(t_cur, alpha, d, D0, B, Q1, Pi, debug=False, fname = None, multip=False))
 print('initial lik was: ', chainb[0])
 print('initial params are: ', chainc[0])
 N = len(chainb)

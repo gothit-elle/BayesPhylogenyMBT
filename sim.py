@@ -198,6 +198,8 @@ def sim_tree(alpha, D0, d, B, Q1, Pi, time, min_leaves = 2, seq_len = 1, debug =
 
 	t2.head.time = 1
 	t2.obs_time = t2.head.find_max_dist()
+	t2.head.scale_tree(0.5/t2.obs_time)
+	t2.obs_time = 0.5
 	t2.seq_len = seq_len
 	t2.head = sim_evo(t2.head, Q1, Pi, seq_len)
 	t2.head.map_leaves()

@@ -47,7 +47,7 @@ def cond_likelihood(cur, P, index, Pi, debug=False):
 
 def sub_lik(k, new_tree, P, Pi, debug=False):
   res = 0
-  for w in range(k,k+50):
+  for w in range(k,k+10):
     #if w != k:
     #  new_tree.head.mark_c_sites(w)
     res += np.log(sum([i*j for (i,j) in zip(Pi,  cond_likelihood(new_tree.head, P, w, Pi, False))]))
@@ -62,7 +62,7 @@ def log_lik(new_tree, P, Pi, debug=False, multip=False):
   if multip:
     if __name__ == 'likelihood':
       pool = Pool()
-      results = pool.starmap(sub_lik, zip(range(0,seq_len,50), repeat(new_tree), repeat(P), repeat(Pi)))
+      results = pool.starmap(sub_lik, zip(range(0,seq_len,10), repeat(new_tree), repeat(P), repeat(Pi)))
       pool.close()
       new_tree.lik = sum(results)
   else: 
