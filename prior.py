@@ -13,6 +13,7 @@ import re
 import warnings
 from multiprocessing import Pool
 from itertools import repeat
+from treestruct import *
 
 warnings.filterwarnings("error")
 
@@ -137,10 +138,8 @@ def int_f(cur, alpha, d, D0, B):
   return np.array(lik).astype(object)
 
 
-def tree_prior(tree, alpha, d, D0, B, logit=True, fname = None, multip=False):
-  cur = tree.head
-  parents = cur.find_parents()
-  leaves = cur.find_leaves()
+def tree_prior(tree, alpha, d, D0, B, logit=True, fname = None, multip=True):
+  leaves, parents = find_levels(tree)
   def ret(e):
     return e.time
   leaves.sort(key=ret)
@@ -163,18 +162,24 @@ def tree_prior(tree, alpha, d, D0, B, logit=True, fname = None, multip=False):
     pool.close()
     for i in range(len(results)):
       parents[i].gval = results[i]
-	  
+      
+      ####### CHANGED ########
+      prod = np.kron(parents[i].left.prior, parents[i].right.prior).astype(object) + np.kron(parents[i].right.prior, parents[i].left.prior).astype(object)
+      parents[i].prior = np.array(parents[i].gval@B@(prod)).astype(object)
+      
   else:
+    return 1
     for parent in parents:
       parent.gval = np.array(G_bkxk(parent.time,parent.dist_from_tip(), alpha, d, D0, B)).astype(object)
   
-  # doesnt work with fractional lengths?
-  t_left = int_f(cur.left, alpha, d, D0, B)
-  t_right = int_f(cur.right, alpha, d, D0, B)
-  G_val = cur.gval
+  # ##### CHANGED 2 @@@@@@@@@@@
+  
+  # t_left = int_f(cur.left, alpha, d, D0, B)
+  # t_right = int_f(cur.right, alpha, d, D0, B)
+  # G_val = cur.gval
   alpha = np.array(alpha).astype(object)
-  prod = np.array(np.kron(t_right, t_left) + np.kron(t_left, t_right)).astype(object)
-  val = alpha@G_val@B@prod
+  #prod = np.array(np.kron(t_right, t_left) + np.kron(t_left, t_right)).astype(object)
+  val = alpha@tree.head.prior
   try:
     if logit:
       val = np.log(val)

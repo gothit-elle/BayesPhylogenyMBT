@@ -10,8 +10,8 @@ if __name__ == '__main__':
 	print('cpu_count is', cpu_count())
 	stopping_time = 15
 	alpha = np.array([0.7,0.3]).astype(object)
-	d, D0, D1, B = build_mtrx(mu0= 0.15, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
-
+	lambda_a = np.array([0.7, 0.1,0.1,0.1,0.1,0.1,0.1,0.2]).astype(object)
+	d, D0, D1, B = build_mtrx(mu0= 0.15, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda_a = lambda_a)
 	
 	# we start a tree
 	# relative rates matrix
@@ -31,14 +31,14 @@ if __name__ == '__main__':
 	random.seed(26111994)
 	print("beginning simulations...")
 	#for i in range(3):
-	t1 = sim_tree(alpha, D0, d, B, Q1, Pi, stopping_time, min_leaves = 50, seq_len = 1000)
+	t1 = sim_tree(alpha, D0, d, B, Q1, Pi, stopping_time, min_leaves = 50, seq_len = 500)
 	t1.disp()
 	print(f"\tgenerated tree with {len(t1.head.find_leaves())} nodes")
 	print("simulations done...")
 	print("starting MCMC chains...")
 	t1 #, t2, t3 = trees
 	multiprocessing.freeze_support()
-	N = 15000
+	N = 20000
 	t = t1.obs_time
 	print(t)
 	# t1.disp()
@@ -48,6 +48,8 @@ if __name__ == '__main__':
 	#str3 = t3.toStr()
 
 	# print('lik is', log_lik(t2, Q1, Pi, False))
+	# all the rate matrices must be increased by the scale time
+	d, D0, D1, B = build_mtrx(mu0= 0.15*t1.scale_time, mu1= 0.1*t1.scale_time, q01 = 0.9*t1.scale_time, q10 =0.001*t1.scale_time, lambda_a = lambda_a*t1.scale_time)
 	
 	target(str1, N, t, Q1, alpha, d, D0, B, Pi, 101, 1, multip=True)
 	#t1 = multiprocessing.Process(target=target, args = (str1, N, t, Q1, alpha, d, D0, B, Pi, 101, 1,))

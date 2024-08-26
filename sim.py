@@ -3,7 +3,7 @@ from nodestruct import *
 from treestruct import *
 
 import random
-
+import uuid
 import os
 import sys
 import inspect
@@ -189,7 +189,7 @@ def sim_tree(alpha, D0, d, B, Q1, Pi, time, min_leaves = 2, seq_len = 1, debug =
 	t2.head = sim_MBT(alpha, D0, np.array(d), B, t2.head, 0, time)
 	t2.head.prune_tree()
 	t2.head = clean_tree(t2.head)
-	max_leaves = int(1.5*min_leaves)
+	max_leaves = int(1.3*min_leaves)
 	while t2.head.right == None or t2.head.left == None or len(t2.head.find_leaves()) < min_leaves or len(t2.head.find_leaves()) > max_leaves:
 		t2.head = sim_MBT(alpha, D0, np.array(d), B, t2.head, 0, time)
 		t2.head.prune_tree()
@@ -198,6 +198,7 @@ def sim_tree(alpha, D0, d, B, Q1, Pi, time, min_leaves = 2, seq_len = 1, debug =
 
 	t2.head.time = 1
 	t2.obs_time = t2.head.find_max_dist()
+	t2.scale_time = t2.obs_time/0.5
 	t2.head.scale_tree(0.5/t2.obs_time)
 	t2.obs_time = 0.5
 	t2.seq_len = seq_len
@@ -207,7 +208,7 @@ def sim_tree(alpha, D0, d, B, Q1, Pi, time, min_leaves = 2, seq_len = 1, debug =
 	# need to grow all leaves to max leaf dist.
 	t2.head.alter_leaves(t2.obs_time)
 	return t2
-import uuid
+
 
 
 def target(s, N, t, Q1, alpha, d, D0, B, Pi, i, pos, multip):
@@ -221,15 +222,15 @@ def target(s, N, t, Q1, alpha, d, D0, B, Pi, i, pos, multip):
 		successes, chaina, chainb, chainc = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos, send_tree=False, multip=multip, tstamp = tstamp)
 
 	print("acceptance rate", successes/len(chaina))
-	with open(currentdir + f"/csv/c{i+1}a.csv", 'w+', newline = '') as csvfile:
+	with open(currentdir + f"/csv/c{tstamp}a.csv", 'w+', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
 		my_writer.writerow(chaina)
 
-	with open(currentdir + f"/csv/c{i+1}b.csv", 'w+', newline = '') as csvfile:
+	with open(currentdir + f"/csv/c{tstamp}b.csv", 'w+', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
 		my_writer.writerow(chainb)
 		
-	with open(currentdir + f"/csv/c{i+1}c.csv", 'w+', newline = '') as csvfile:
+	with open(currentdir + f"/csv/c{tstamp}c.csv", 'w+', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
 		my_writer.writerow(chainc)
 		

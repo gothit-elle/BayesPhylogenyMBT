@@ -255,7 +255,9 @@ class node:
       parents += self.right.find_parents()
       parents += self.left.find_parents()
     return parents
-    
+   
+
+	
   def find_leaf_dists(self):
     dists = []
     leaves = self.find_leaves()

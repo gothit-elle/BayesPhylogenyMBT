@@ -2,6 +2,7 @@ from scipy.linalg import fractional_matrix_power, expm
 from multiprocessing import Pool, freeze_support, cpu_count
 from itertools import repeat
 import numpy as np
+from treestruct import *
 
 BASES = ["A","C", "G", "T"]
 
@@ -43,14 +44,36 @@ def cond_likelihood(cur, P, index, Pi, debug=False):
   if debug: print("printing...", cur.seq, cur.time, cur.lik)
   return cur.lik
 
+def cond_likelihood2(tree, P, index, Pi, debug=False):
+  leaves, parents = find_levels(tree)
+  for leaf in leaves:
+    leaf.lik = leaf.base2int(index)
+    if leaf.lik == -1:
+      leaf.lik = Pi
+	  
+  for parent in parents:
+    # we have the likelihoods.
+    # pick a base:
+    L = []
+    for sk in BASES:
+      left = 0
+      right = 0
+      for j in range(len(BASES)):
+          si = BASES[j]
+          left += prob(P, base2int(sk), base2int(si), parent.right.time)*parent.right.lik[j]
+          right += prob(P, base2int(sk), base2int(si), parent.left.time)*parent.left.lik[j]
+      L.append(left*right)
+    parent.lik = L
+  if debug: print("printing...", tree.head.seq, tree.head.time, tree.head.lik)
+  return tree.head.lik
 
 
 def sub_lik(k, new_tree, P, Pi, debug=False):
   res = 0
-  for w in range(k,k+10):
+  for w in range(k,k+50):
     #if w != k:
     #  new_tree.head.mark_c_sites(w)
-    res += np.log(sum([i*j for (i,j) in zip(Pi,  cond_likelihood(new_tree.head, P, w, Pi, False))]))
+    res += np.log(sum([i*j for (i,j) in zip(Pi,  cond_likelihood2(new_tree, P, w, Pi, False))]))
   return res
  
 
@@ -62,7 +85,7 @@ def log_lik(new_tree, P, Pi, debug=False, multip=False):
   if multip:
     if __name__ == 'likelihood':
       pool = Pool()
-      results = pool.starmap(sub_lik, zip(range(0,seq_len,10), repeat(new_tree), repeat(P), repeat(Pi)))
+      results = pool.starmap(sub_lik, zip(range(0,seq_len,50), repeat(new_tree), repeat(P), repeat(Pi)))
       pool.close()
       new_tree.lik = sum(results)
   else: 

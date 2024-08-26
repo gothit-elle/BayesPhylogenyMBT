@@ -7,33 +7,33 @@ chaina = []
 chainb = []
 chainc = []
 
-for i in range(4): 
-	with open(f"../thesis_likelihood\csv\c{i+1}a.csv", newline='') as f:
-		reader = csv.reader(f, delimiter='Y')
-		data = list(reader)
-	chaina += data
-	
-	with open(f"../thesis_likelihood\csv\c{i+1}b.csv", newline='') as f:
-		data= []
-		reader = csv.reader(f,  delimiter='Y')
-		for line in reader:
-			data.append([float(x) for x in line])
-	chainb += data
-	
-	with open(f"../thesis_likelihood\csv\c{i+1}c.csv", newline='') as f:
-		reader = csv.reader(f,  delimiter='Y')
-		data = list(reader)
-	chainc += data
+i = "cd6d672b82ad4dc8bc5b56ba6cdb9941"
+with open(f"../thesis_likelihood\csv\c{i+1}a.csv", newline='') as f:
+	reader = csv.reader(f, delimiter='Y')
+	data = list(reader)
+chaina += data
 
-for i in range(4):
-	lst = chainb[i]
-	ind = np.argmax(lst)
-	s = chaina[i][ind]
-	t_cur = Tree(1)
-	t_cur.str2tree(s,20,by='io')
-	t_cur.disp()
-	print("lik is: ", chainb[i][ind])
-	
+with open(f"../thesis_likelihood\csv\c{i+1}b.csv", newline='') as f:
+	data= []
+	reader = csv.reader(f,  delimiter='Y')
+	for line in reader:
+		data.append([float(x) for x in line])
+chainb += data
+
+with open(f"../thesis_likelihood\csv\c{i+1}c.csv", newline='') as f:
+	reader = csv.reader(f,  delimiter='Y')
+	data = list(reader)
+chainc += data
+
+
+lst = chainb[i]
+ind = np.argmax(lst)
+s = chaina[i][ind]
+t_cur = Tree(1)
+t_cur.str2tree(s,20,by='io')
+t_cur.disp()
+print("lik is: ", chainb[i][ind])
+
 N = len(chainb[0])
 plt.plot(range(N), chainb[0], range(N), chainb[1], range(N), chainb[2], range(N), chainb[3])
 params = {'mathtext.default': 'regular' }

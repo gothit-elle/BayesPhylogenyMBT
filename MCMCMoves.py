@@ -21,7 +21,7 @@ WINDOW_ALPHA = 0.1
 WINDOW_D0 = 0.1
 WINDOW_B = 0.1
 WINDOW_MU = 0.1
-
+TOLER = 0.01
 
 def find_node_n(cur, call, pick_node):
     ret = None
@@ -300,7 +300,7 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
       if debug: print("vector is", vector)
       return vector
 
-    randnum = np.random.choice(3) # 3 here prevents birth rates from changing
+    randnum = np.random.choice(4) # 3 here prevents birth rates from changing
     v = np.array([D0_cpy[0,1], D0_cpy[1,0]]).astype(object)
 
     if randnum == 0:
@@ -331,7 +331,7 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
     temp = D0_cpy@np.ones(len(B)) + D1_cpy@np.ones(len(B))+d_cpy
     np.testing.assert_allclose(np.array(temp).astype(np.float64), 0, atol=1e-7)
 
-  if tcpy.head.is_neg():
+  if tcpy.head.is_neg() or (tcpy.head.find_max_dist() > tree.obs_time + TOLER):
     return EXIT_FAILURE
   return tcpy, Q, alpha_cpy, d_cpy, D0_cpy, B_cpy, move_type
   
@@ -402,7 +402,7 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
     chain1a.append(t_cur.toStr())
     chain1b.append(p1)
     chain1c.append((dcpy(alpha), dcpy(d), dcpy(D0), dcpy(B)))
-    if i % 14900 == 0:
+    if i % 7499== 0:
       with open(currentdir + f"/csv/{tstamp}_a.csv", 'w+', newline = '') as csvfile:
         my_writer = csv.writer(csvfile, delimiter = 'Y')
         my_writer.writerow(chain1a)

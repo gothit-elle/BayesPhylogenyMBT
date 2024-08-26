@@ -9,6 +9,7 @@ class Tree:
     self.lik = None
     self.seq_len = seq_len
     self.obs_time = None
+    self.scale_time = 1
 
   def disp(self, log=False, fname=None):
     print(self.head, file = fname)
@@ -139,3 +140,21 @@ class Tree:
     self.obs_time = self.head.dist_from_tip() + self.head.time
 
 # end struct
+
+### This function finds nodes by level. The first node in parents is the root, followed by its two non leaf children, followed by their four non leaf children, etc. 
+### we reverse it to find which nodes we need to resolve first. 
+def find_levels(tree):
+  parents = []
+  leaves = []
+  found = [tree.head]
+  traverse = []
+  while found != []:
+    traverse = found
+    found = []
+    for cur in traverse:
+      if not cur.isLeaf():
+        parents += [cur]
+        found += [cur.left, cur.right]
+      else:
+          leaves += [cur]
+  return leaves, parents[::-1]
