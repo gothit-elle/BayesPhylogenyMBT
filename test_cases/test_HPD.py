@@ -6,7 +6,9 @@ import inspect
 import arviz
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
+gparentdir = os.path.dirname(parentdir)
 sys.path.insert(0, parentdir) 
+sys.path.insert(0, gparentdir) 
 import numpy as np
 from treestruct import *
 from multiprocessing import Pool, freeze_support
@@ -20,7 +22,7 @@ from scipy import stats
 from lbd_prior import *
 from prior import *
 
-TOLER = 0.1 
+TOLER = 5
 
 def read_chains(i):
 	data = [] 
@@ -31,7 +33,7 @@ def read_chains(i):
 	while True:
 		try:
 			# print("reading file1")
-			with open(parentdir + f"/csv/{i}a.csv", newline='') as f:
+			with open(gparentdir + f"/thesis_likelihood_csv_files/csv/{i}a.csv", newline='') as f:
 				reader = pd.read_csv(f, delimiter='Y', header=None, skiprows=k)
 				for n, line in reader.items():
 					data.append(line[0])
@@ -45,7 +47,7 @@ def read_chains(i):
 	while True:
 		try:
 			# print("reading file2")
-			with open(parentdir + f"/csv/{i}b.csv", newline='') as f:
+			with open(gparentdir + f"/thesis_likelihood_csv_files/csv/{i}b.csv", newline='') as f:
 				data= []
 				reader = pd.read_csv(f, delimiter='Y', header=None, skiprows=k)
 				for n, line in reader.items():
@@ -61,7 +63,7 @@ def read_chains(i):
 		try:
 			# print("reading file3")
 			
-			with open(parentdir + f"/csv/{i}c.csv", newline='') as f:
+			with open(gparentdir + f"/thesis_likelihood_csv_files/csv/{i}c.csv", newline='') as f:
 				reader = pd.read_csv(f, delimiter='Y', header=None, skiprows=k)
 				for n, line in reader.items():
 					data.append(line[0])
@@ -139,9 +141,9 @@ palette = cycle(colours)
 
 # p1 = sns.displot(data=df, x='x1', kind='hist', bins=40, stat='density')
 def plotfig(x1, name, clear=False, f = f, ptype = sns.histplot, fit=stats.norm):
-	ax = ptype(x1,stat='density', color = next(palette) ) #
+	ax = ptype(x1,stat='count', binwidth=0.05, color = next(palette) ) #
 	params=fit.fit(x1)
-	print(params)
+	#print(params)
 	#xx = np.linspace(*ax.get_xlim(),100)
 	#ax.plot(f(xx), f(fit.pdf(xx, *params)), color = next(palette) )
 	
@@ -237,8 +239,7 @@ def plot_stats(init_tree, ml_tree, chainc, chaina, ind, rf_totals, alpha, d, D0,
 	results = pool.starmap(plot_arr, zip([alpha, d, D0, B], repeat(i))) 
 	pool.close()
 	
-	"""
-	"""
+
 	pool = Pool()
 	results = pool.map(find_pop_curve, chaina[1000:]) # remove burn in
 	pool.close()
@@ -270,10 +271,9 @@ if __name__ == '__main__':
 	rf_totals = []
 	rf_lbd = []
 	# Iterate directory
-	
-	for path in os.listdir(parentdir + "/csv/"):
+	for path in os.listdir(gparentdir + f"/thesis_likelihood_csv_files/csv/"):
 		# check if current path is a file
-		if os.path.isfile(os.path.join(parentdir + "/csv/", path)):
+		if os.path.isfile(os.path.join(gparentdir + "/thesis_likelihood_csv_files/csv/", path)):
 			if path[-5] == 'a':
 				hashes.append(path[0:-5])
 	print(hashes)
@@ -312,6 +312,7 @@ if __name__ == '__main__':
 			if init_tree.obs_time + TOLER <  ml_tree.obs_time or init_tree.obs_time - TOLER > ml_tree.obs_time:
 				print("\t FALSE ", init_tree.obs_time, ml_tree.obs_time )
 			else:
+				print("\t TRUE ", init_tree.obs_time, ml_tree.obs_time )
 				alpha, d, D0, B = calc_param_means(chainc[1000:]) # remove burn in
 				N = len(chainc[1000:]) 
 				# find_MBT_stats(chainb, i)
@@ -328,11 +329,11 @@ if __name__ == '__main__':
 				print("\t ml D0: ", D0[ind])
 				print("\t ml B: ", B[ind])
 				rf_totals = plot_stats(init_tree, ml_tree, chainc, chaina, ind, rf_totals, alpha, d, D0, B)
-				rf_lbd = MLE_lbd(chaina[1000:], chainb[1000:], chainc[1000:], alpha, d, D0, B, rf_lbd)
+				# rf_lbd = MLE_lbd(chaina[1000:], chainb[1000:], chainc[1000:], alpha, d, D0, B, rf_lbd)
 				
 				
-	#plotfig(np.array(rf_totals), "normalised rf distance", clear=True)
-	plotfig(np.array(rf_lbd), "normalised rf distance with LBD prior", clear=True)
+	plotfig(np.array(rf_totals), "normalised rf distance", clear=True)
+	#plotfig(np.array(rf_lbd), "normalised rf distance with LBD prior", clear=True)
 	#print("sample size = ", len(rf_totals))
 
 	#print(find_pop_curve(t_cur))

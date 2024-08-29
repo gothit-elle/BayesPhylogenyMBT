@@ -1,17 +1,25 @@
 from sim import * 
 from buildmtrx import *
 import numpy as np 
+import uuid
 
-
-
+import json
 import multiprocessing
+import os
+import sys
+import inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir) 
+
+
 
 if __name__ == '__main__':
-	print('cpu_count is', cpu_count())
-	stopping_time = 15
+
+	stopping_time = 10
 	alpha = np.array([0.7,0.3]).astype(object)
-	lambda_a = np.array([0.7, 0.1,0.1,0.1,0.1,0.1,0.1,0.2]).astype(object)
-	d, D0, D1, B = build_mtrx(mu0= 0.15, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda_a = lambda_a)
+	lambda_a = np.array([1, 0,0,0,0,0,0,0.1]).astype(object)
+	d, D0, D1, B = build_mtrx(mu0= 0.3, mu1= 0.1, q01 = 0.9, q10 =0.1, lambda_a = lambda_a)
 	
 	# we start a tree
 	# relative rates matrix
@@ -31,14 +39,26 @@ if __name__ == '__main__':
 	random.seed(26111994)
 	print("beginning simulations...")
 	#for i in range(3):
-	t1 = sim_tree(alpha, D0, d, B, Q1, Pi, stopping_time, min_leaves = 50, seq_len = 500)
-	t1.disp()
-	print(f"\tgenerated tree with {len(t1.head.find_leaves())} nodes")
+	t1 = sim_tree(alpha, D0, d, B, Q1, Pi, stopping_time, min_leaves = 50, seq_len = 1000)
+	tstamp = str(uuid.uuid4().hex)
+
+	print(t1.head.to_newick(), "\n", tstamp)
+	leaves = t1.head.find_leaves()
+	mydict = {}
+	
+
+	
+	for leaf in leaves:
+		mydict[leaf.map] = leaf.seq
+	with open(currentdir + f"/csv/{tstamp}.json", 'w') as f:
+		f.write(json.dumps(mydict)) 
+	f.close()
+	print(f"\tgenerated tree with {len(leaves)} nodes")
 	print("simulations done...")
 	print("starting MCMC chains...")
 	t1 #, t2, t3 = trees
 	multiprocessing.freeze_support()
-	N = 20000
+	N = 10000
 	t = t1.obs_time
 	print(t)
 	# t1.disp()
@@ -47,11 +67,9 @@ if __name__ == '__main__':
 	#str2 = t2.toStr()
 	#str3 = t3.toStr()
 
-	# print('lik is', log_lik(t2, Q1, Pi, False))
-	# all the rate matrices must be increased by the scale time
-	d, D0, D1, B = build_mtrx(mu0= 0.15*t1.scale_time, mu1= 0.1*t1.scale_time, q01 = 0.9*t1.scale_time, q10 =0.001*t1.scale_time, lambda_a = lambda_a*t1.scale_time)
+
 	
-	target(str1, N, t, Q1, alpha, d, D0, B, Pi, 101, 1, multip=True)
+	target(str1, N, t, Q1, alpha, d, D0, B, Pi, 1, multip=True, tstamp = tstamp)
 	#t1 = multiprocessing.Process(target=target, args = (str1, N, t, Q1, alpha, d, D0, B, Pi, 101, 1,))
 	#t2 = multiprocessing.Process(target=target, args = (str2, N, t, Q1, alpha, d, D0, B, Pi, 102, 2,))
 	#t3 = multiprocessing.Process(target=target, args = (str3, N, t, Q1, alpha, d, D0, B, Pi, 103, 3,))

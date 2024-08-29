@@ -60,8 +60,8 @@ def cond_likelihood2(tree, P, index, Pi, debug=False):
       right = 0
       for j in range(len(BASES)):
           si = BASES[j]
-          left += prob(P, base2int(sk), base2int(si), parent.right.time)*parent.right.lik[j]
-          right += prob(P, base2int(sk), base2int(si), parent.left.time)*parent.left.lik[j]
+          left += prob(P, base2int(sk), base2int(si), parent.right.time*tree.scale_time)*parent.right.lik[j]
+          right += prob(P, base2int(sk), base2int(si), parent.left.time*tree.scale_time)*parent.left.lik[j]
       L.append(left*right)
     parent.lik = L
   if debug: print("printing...", tree.head.seq, tree.head.time, tree.head.lik)

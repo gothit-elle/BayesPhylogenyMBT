@@ -2,6 +2,9 @@ import numpy as np
 from multiprocessing import Pool
 from itertools import repeat
 from math import factorial
+from treestruct import *
+
+
 def G_bd(z,x, lambda0, mu0):
   c = lambda0-mu0
   num = np.exp(c*z)*(mu0-lambda0*np.exp(c*x))**2
@@ -58,20 +61,23 @@ def bd_lik(tree, lambda0, mu0, log=True, adj = True):
     val = np.log(val)
   return val
   
-def lin_bd_lik(lambda0, mu0, tree):
-  cur = tree.head
+def lin_bd_lik(B, d, tree):
+  lambda0 = np.average(B)
+  mu0 = np.average(d)
+  leaves, parents = find_levels(tree)
+
   r = lambda0-mu0
   a = mu0/lambda0
-  leaves = cur.find_leaves()
+
   n = len(leaves)
   adj = 0
-  parents = cur.right.find_parents() + cur.left.find_parents()
-  sum1 = 0
+
+  sum1 = -parents[-1].dist_from_tip() # root not counted
   prod1 = 1
   for node in parents +leaves:
     sum1 += node.dist_from_tip()
-  for node in parents+leaves+[cur]:
     x = node.dist_from_tip()
     prod1 *= 1/(np.exp(r*x)-a)**2
+	
   adj = factorial(n-1)*r**(n-2)*(1-a)**n*prod1*(np.exp(r*sum1))
   return np.log(adj)

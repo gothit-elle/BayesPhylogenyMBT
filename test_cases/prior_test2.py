@@ -34,13 +34,14 @@ def get_D1h(b):
 
 if __name__ == '__main__':
 	alpha = np.array([0.5,0.5]).astype(object)
-	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
+	lambda_a = np.array([1, 0,0,0,0,0,0,0.099]).astype(object)
+	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda_a = lambda_a)
 
 
 	plot = 0
 	new_tree = Tree(1)
 	alpha = np.array([0.5,0.5]).astype(object)
-	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
+	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda_a = lambda_a)
 	b1 = 2
 	b2 = 1
 	b3 = 8
@@ -57,17 +58,20 @@ if __name__ == '__main__':
 	new_tree.disp()
 
 	liks = [0,0,0,0]
-	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
+	lambda_a = np.array([1, 0,0,0,0,0,0,0.099]).astype(object)
+	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda_a = lambda_a)
 	liks[0] = tree_prior(new_tree,alpha, d, D0, B, True, None, True)
 
-
-	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1 = 0.1, q01 = 0.9, q10 =0.001, lambda0 = 0.3, lambda1 = 0.099)
+	lambda_a = np.array([0.3, 0,0,0,0,0,0,0.099]).astype(object)
+	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1 = 0.1, q01 = 0.9, q10 =0.001, lambda_a = lambda_a)
 	liks[1] = tree_prior(new_tree,alpha, d, D0, B, True, None, True)
-
-	d, D0, D1, B = build_mtrx(mu0= 0.999, mu1 = 0.099, q01 = 0.2, q10 =0.001, lambda0 = 1, lambda1 = 1)
+	
+	lambda_a = np.array([1, 0,0,0,0,0,0,1]).astype(object)
+	d, D0, D1, B = build_mtrx(mu0= 0.999, mu1 = 0.099, q01 = 0.2, q10 =0.001, lambda_a = lambda_a)
 	liks[2] = tree_prior(new_tree,alpha, d, D0, B, True, None, True)
 
-	d, D0, D1, B = build_mtrx(mu0= 0.2, mu1 = 0.099, q01 = 0.2, q10 =0.001, lambda0 = 1, lambda1 = 1)
+	lambda_a = np.array([1, 0,0,0,0,0,0,1]).astype(object)
+	d, D0, D1, B = build_mtrx(mu0= 0.2, mu1 = 0.099, q01 = 0.2, q10 =0.001, lambda_a = lambda_a)
 	liks[3] = tree_prior(new_tree,alpha, d, D0, B, True, None, True)
 	
 	print("the tree priors are")

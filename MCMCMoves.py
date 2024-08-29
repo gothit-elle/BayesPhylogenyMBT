@@ -8,6 +8,9 @@ import csv
 import os
 import sys
 import inspect
+
+from lbd_prior import *
+
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
@@ -330,9 +333,12 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
     D0_cpy = D0_cpy - np.diag(D0_cpy@np.ones(len(B)) + D1_cpy@np.ones(len(B))+d_cpy).astype(object)
     temp = D0_cpy@np.ones(len(B)) + D1_cpy@np.ones(len(B))+d_cpy
     np.testing.assert_allclose(np.array(temp).astype(np.float64), 0, atol=1e-7)
-
-  if tcpy.head.is_neg() or (tcpy.head.find_max_dist() > tree.obs_time + TOLER):
+  
+  md_n = tcpy.head.find_max_dist()
+  
+  if tcpy.head.is_neg() or (md_n > tree.obs_time + TOLER):
     return EXIT_FAILURE
+  tcpy.head.scale_tree(tree.obs_time/md_n) # try to keep the obs time the same.
   return tcpy, Q, alpha_cpy, d_cpy, D0_cpy, B_cpy, move_type
   
 from decimal import *
@@ -343,6 +349,7 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
   chain1a = []
   chain1b = []
   chain1c = []
+  chain1d = []
   if send_tree:
     t_cur = s
   else:
@@ -352,10 +359,14 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
   p1_t = tree_posterior(t_cur, alpha, d, D0, B, Q1, Pi, debug=False, fname = fname, multip=multip)
   #print(p1, file=fname)
   p1 = sum(p1_t)
+  
 
+  lbd_p = lin_bd_lik(B, d, t_cur) #bd_lik(tree, lambda0, mu0, log=True, adj = True)
+  lbd_post = lbd_p + p1_t[1]
   chain1a.append(t_cur.toStr())
   chain1b.append(p1)
   chain1c.append((dcpy(alpha), dcpy(d), dcpy(D0), dcpy(B)))
+  chain1d.append(lbd_post)
 
   successes = 0
   for i in tqdm(range(N), position=pos):
@@ -369,7 +380,7 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
       if debug: t_new.disp()
       if move_type == 5: 
 	  # ranodm walk for params occurred, lik same
-        p_new_t[1] = tree_prior(t_new, alpha_new, d_new, D0_new, B_new, logit=True, fname=fname, multip=multip)
+        p_new_t[0] = tree_prior(t_new, alpha_new, d_new, D0_new, B_new, logit=True, fname=fname, multip=multip)
       else:
         p_new_t = tree_posterior(t_new, alpha_new, d_new, D0_new, B_new, Q1, Pi, log, fname, multip=multip)
       p_new= sum(p_new_t)
@@ -399,10 +410,13 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
         d = d_new
         D0 = D0_new
         B = B_new
-    chain1a.append(t_cur.toStr())
+        lbd_p = lin_bd_lik(B, d, t_cur) 
+        lbd_post = lbd_p + p_new_t[1]
+    chain1a.append(t_cur.head.to_newick())
     chain1b.append(p1)
     chain1c.append((dcpy(alpha), dcpy(d), dcpy(D0), dcpy(B)))
-    if i % 7499== 0:
+    chain1d.append(lbd_post)
+    if i % 9900== 0:
       with open(currentdir + f"/csv/{tstamp}_a.csv", 'w+', newline = '') as csvfile:
         my_writer = csv.writer(csvfile, delimiter = 'Y')
         my_writer.writerow(chain1a)
@@ -415,6 +429,10 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
         my_writer = csv.writer(csvfile, delimiter = 'Y')
         my_writer.writerow(chain1c)
       csvfile.close()
+      with open(currentdir + f"/csv/{tstamp}_d.csv", 'w+', newline = '') as csvfile:
+        my_writer = csv.writer(csvfile, delimiter = 'Y')
+        my_writer.writerow(chain1d)
+      csvfile.close()
 
 
-  return successes, chain1a, chain1b, chain1c
+  return successes, chain1a, chain1b, chain1c, chain1d

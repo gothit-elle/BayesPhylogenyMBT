@@ -179,6 +179,7 @@ def tree_prior(tree, alpha, d, D0, B, logit=True, fname = None, multip=True):
   # G_val = cur.gval
   alpha = np.array(alpha).astype(object)
   #prod = np.array(np.kron(t_right, t_left) + np.kron(t_left, t_right)).astype(object)
+
   val = alpha@tree.head.prior
   try:
     if logit:

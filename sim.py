@@ -3,14 +3,14 @@ from nodestruct import *
 from treestruct import *
 
 import random
-import uuid
+
 import os
 import sys
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
-import glob
+
 
 from MCMCMoves import *
 import csv
@@ -19,7 +19,7 @@ from scipy.linalg import expm
 BASES = ["A","C", "G", "T"]
 MAPPING_2P = {0: (0,0), 1: (0,1), 2: (1,0), 3: (1,1)}
 
-def sim_evo(cur, Q, Pi, seq_len):
+def sim_evo(cur, Q, Pi, seq_len, scale):
 	if cur == None:
 		return None
 	for seq_index in range(seq_len): # simulate a whole sequence
@@ -48,7 +48,7 @@ def sim_evo(cur, Q, Pi, seq_len):
 			
 		# we have our state so now lets have a seq 
 		u = np.random.uniform(0,1)
-		res = event(expm(Q*cur.time), u, state, False, 0) 
+		res = event(expm(Q*cur.time*scale), u, state, False, 0) 
 		state = int(res[1])
 		if cur.seq == None or cur.seq == 'N':
 			cur.seq = BASES[state]
@@ -58,8 +58,8 @@ def sim_evo(cur, Q, Pi, seq_len):
 	if not cur.isLeaf():
 		cur.right.parent = cur
 		cur.left.parent = cur
-	cur.right = sim_evo(cur.right, Q, Pi, seq_len)
-	cur.left = sim_evo(cur.left, Q, Pi, seq_len)
+	cur.right = sim_evo(cur.right, Q, Pi, seq_len, scale)
+	cur.left = sim_evo(cur.left, Q, Pi, seq_len, scale)
 	return cur
 	
 def event(mtrx, u, state, skip, sum):
@@ -198,11 +198,11 @@ def sim_tree(alpha, D0, d, B, Q1, Pi, time, min_leaves = 2, seq_len = 1, debug =
 
 	t2.head.time = 1
 	t2.obs_time = t2.head.find_max_dist()
-	t2.scale_time = t2.obs_time/0.5
-	t2.head.scale_tree(0.5/t2.obs_time)
-	t2.obs_time = 0.5
+	t2.scale_time = 0.5/t2.obs_time
+	#t2.head.scale_tree(0.5/t2.obs_time)
+	#t2.obs_time = 0.5
 	t2.seq_len = seq_len
-	t2.head = sim_evo(t2.head, Q1, Pi, seq_len)
+	t2.head = sim_evo(t2.head, Q1, Pi, seq_len, t2.scale_time) # when doing likelihood, we will scale the branches down (same as altering mu)
 	t2.head.map_leaves()
     
 	# need to grow all leaves to max leaf dist.
@@ -211,27 +211,30 @@ def sim_tree(alpha, D0, d, B, Q1, Pi, time, min_leaves = 2, seq_len = 1, debug =
 
 
 
-def target(s, N, t, Q1, alpha, d, D0, B, Pi, i, pos, multip):
-	tstamp = str(uuid.uuid4().hex)
-	print(tstamp)
+def target(s, N, t, Q1, alpha, d, D0, B, Pi, pos, multip, tstamp):
+
 	#print(currentdir + '/csv/*')
 	#files = glob.glob(currentdir + '/csv/*')
 	#for f in files:
 	#	os.remove(f)
 	with open(currentdir + '/csv/logr.txt', "w+", encoding="utf-8") as f:
-		successes, chaina, chainb, chainc = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos, send_tree=False, multip=multip, tstamp = tstamp)
+		successes, chaina, chainb, chainc, chaind = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos, send_tree=False, multip=multip, tstamp = tstamp)
 
 	print("acceptance rate", successes/len(chaina))
-	with open(currentdir + f"/csv/c{tstamp}a.csv", 'w+', newline = '') as csvfile:
+	with open(currentdir + f"/csv/{tstamp}_a.csv", 'w+', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
 		my_writer.writerow(chaina)
 
-	with open(currentdir + f"/csv/c{tstamp}b.csv", 'w+', newline = '') as csvfile:
+	with open(currentdir + f"/csv/{tstamp}_b.csv", 'w+', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
 		my_writer.writerow(chainb)
 		
-	with open(currentdir + f"/csv/c{tstamp}c.csv", 'w+', newline = '') as csvfile:
+	with open(currentdir + f"/csv/{tstamp}_c.csv", 'w+', newline = '') as csvfile:
 		my_writer = csv.writer(csvfile, delimiter = 'Y')
-		my_writer.writerow(chainc)
+		my_writer.writerow(chainc)	
+	
+	with open(currentdir + f"/csv/{tstamp}_d.csv", 'w+', newline = '') as csvfile:
+		my_writer = csv.writer(csvfile, delimiter = 'Y')
+		my_writer.writerow(chaind)
 		
 
