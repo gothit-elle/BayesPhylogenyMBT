@@ -16,7 +16,7 @@ sys.path.insert(0, parentdir)
 
 if __name__ == '__main__':
 
-	stopping_time = 10
+	stopping_time = 15
 	alpha = np.array([0.7,0.3]).astype(object)
 	lambda_a = np.array([1, 0,0,0,0,0,0,0.1]).astype(object)
 	d, D0, D1, B = build_mtrx(mu0= 0.3, mu1= 0.1, q01 = 0.9, q10 =0.1, lambda_a = lambda_a)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 	print("starting MCMC chains...")
 	t1 #, t2, t3 = trees
 	multiprocessing.freeze_support()
-	N = 10000
+	N = 30000
 	t = t1.obs_time
 	print(t)
 	# t1.disp()

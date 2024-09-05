@@ -17,7 +17,11 @@ class Tree:
   def toStr(self):
     #convert tree to string
     return self.head.toStr()
-
+    
+  def newick(self):
+    #convert tree to string
+    return self.head.to_newick()
+    
   def fix_leaves(self):
     leaves = self.head.find_leaves()
     dists = self.head.find_leaf_dists()
@@ -51,7 +55,7 @@ class Tree:
 
 
   def str2tree(self, nodeStr, t=None, by="df", debug=False, tol = 0.001):
-    if by == 'io':
+    if by == 'io':  # format of:  "(0.1 / 'T'(0.2 / 'G'(1 / 'A')(0.5 / 'T'(0.5 / 'T')(0.5 / 'T')))(1.1 / 'C'(0.1 / 'A')(0.1 / 'A')))"
       # convert string to tree (in order traversal)
       seq = re.search("[A-Z]+",nodeStr).group()
       time= re.search("\d+[.]?\d*",nodeStr).group()
@@ -135,6 +139,50 @@ class Tree:
         else:
           time_tracker -= cur.time
           cur = cur.parent
+          
+    elif by=='nw': # format of: ((D:0.723274,F:0.567784)E:0.067192,(B:0.279326,H:0.756049)B:0.807788);
+        
+      new_node = node('N', None, 0)
+      cur = new_node
+      i = 0
+      while i < len(nodeStr):
+        elem = nodeStr[i]
+        if elem == ";": break
+        if elem == "(": # create child node on right
+          cur.right = node('N', cur, 0)
+
+          cur = cur.right        
+        elif elem == ",": # go back one level and create left child        
+          cur = cur.parent            
+          cur.left = node('N', cur, 0)
+
+          cur = cur.left
+
+        elif elem ==")":
+          cur = cur.parent
+
+		  
+        else:
+          j = i
+          while nodeStr[j] != "(" and nodeStr[j] != ")" and nodeStr[j] != "," and nodeStr[j] != ";":
+            j+=1
+
+          slice = nodeStr[i:j]
+
+          i = j
+          dat = slice.split(":")
+          try: 
+            time= float(dat[1])
+          except:
+            print(slice)
+          map = dat[0]
+          if map == 'None':
+            map = 'N'
+          cur.time = time
+          cur.map = map
+          i -=1
+          #  seq = None
+        i+=1
 
     self.head = new_node
     self.obs_time = self.head.dist_from_tip() + self.head.time

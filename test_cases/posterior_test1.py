@@ -29,9 +29,9 @@ if __name__ == '__main__':
 	Q1 = R@np.diag(Pi)
 	# need to adjust so rows sum to 0
 	Q1 -= np.diag(Q1@np.ones(4))
-
+	lambda_a = np.array([1,0,0,0,0,0,0,0.099])
 	alpha = np.array([0.5,0.5]).astype(object)
-	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda0 = 1, lambda1 = 0.099)
+	d, D0, D1, B = build_mtrx(mu0= 0.1, mu1= 0.1, q01 = 0.9, q10 =0.001, lambda_a = lambda_a)
 
 
 	nodeStr = "2A.1T.17C.8G.9G.9T.18A." # nodes and branch lengths
@@ -41,11 +41,34 @@ if __name__ == '__main__':
 	trees[0].str2tree(nodeStr,t,by='df')
 	trees[0].disp()
 
-	mystr = "(4 / 'T'(2 / 'G'(5 / 'A')(5 / 'T'))(7 / 'C'))"
+	mystr = "(4 / 'T' (2 / 'G'(5 / 'A' + 'SpeciesTwo')(5 / 'T' + 'SpeciesThree'))(7 / 'C' + 'SpeciesFour'))"
 	t2 = Tree(1)
 	t2.str2tree(mystr,4+7, by='io')
 	trees.append(t2)
 	t2.disp()
+	print(mystr)
+	str2 = t2.head.to_newick()
+	print(str2)
+	print(str2.replace("None", ''))
+	t3 = Tree(1)
+	t3.str2tree(str2,4+7, by='nw')
+	t3.disp()
+	
+	import phylotreelib as pt
+	str = "(Goril-la:3.356352, (Human:2, (Chimpanzee:1, Bonobo:1):1):1):0.5;"
+	N = len(str)
+	for j in range(N):
+		i = str[N - j - 1]
+		print(i)
+		if i == ':':
+			str = str[:N-j-1]
+			str += ";"
+			break
+			
+	print(str)
+	mytree = pt.Tree.from_string(str)
+	
+	print(mytree)
 
 	nodeStr = "2T.3G.5A.5T.7C.1A.1T" # nodes and branch lengths
 	t2 = Tree(1)

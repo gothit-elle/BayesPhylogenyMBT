@@ -73,11 +73,11 @@ def lin_bd_lik(B, d, tree):
   adj = 0
 
   sum1 = -parents[-1].dist_from_tip() # root not counted
-  prod1 = 1
+  prod1 = 0
   for node in parents +leaves:
     sum1 += node.dist_from_tip()
     x = node.dist_from_tip()
-    prod1 *= 1/(np.exp(r*x)-a)**2
+    prod1 += -2*np.log(np.array(abs(np.exp(r*x)-a)).astype(np.float64))
 	
-  adj = factorial(n-1)*r**(n-2)*(1-a)**n*prod1*(np.exp(r*sum1))
-  return np.log(adj)
+  adj = np.log(np.array(factorial(n-1)).astype(np.float64)) + (n-2)*np.log(np.array(abs(r)).astype(np.float64)) + n*np.log(np.array(abs(1-a)).astype(np.float64)) + prod1 + r*sum1
+  return adj

@@ -32,8 +32,9 @@ def get_E(end, alpha, d, D0, B, plot=0):
 
     stateE0 = np.array([0,0]) # E(0) = 0 initial cond
     if plot:
-      times = np.linspace(0, end)
-      x_sol = solve_ivp(E_sol, [0,end], stateE0, t_eval=times, atol=toler, rtol=toler, method='RK45')
+      times = np.linspace(0, end, 100)
+      x_sol = solve_ivp(E_sol, [0,end], stateE0, t_eval=times, atol=1e-13, rtol=1e-13, method='RK45')
+      return x_sol
     else:
       x_sol = solve_ivp(E_sol, [0,end], stateE0, atol=toler, rtol=toler, method='RK45')
     return  x_sol.y[:, -1]

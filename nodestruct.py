@@ -199,7 +199,7 @@ class node:
     return ret
     
     
-# two functions below copied from https://stackoverflow.com/a/61123048
+  # two functions below copied from https://stackoverflow.com/a/61123048
 
 
   def traverse(self, newick):

@@ -1,0 +1,51 @@
+generate loads of tests and calculate statistics
+- maybe do element wise derivatives for kolgolmorv backwards like in sophies phd thesis
+
+sophies paper with mark on EM algorithm to compare MBT models <-- very important
+plot time until extinction curves. 
+
+update high level overview
+
+future work mention limitations
+
+update details so that the exact simulation process is in there, ina new section
+
+ 
+
+double check the MCMC convergence ---> fuck.
+
+
+
+is there a distance metric that includes tree branch lengths? look into it
+
+such as: kendall-colijn metric
+
+ 
+
+do frequency instead of density on rf distance hist plot
+
+
+look at beast paper and see how they test it
+ 
+
+need some sort of argument that it is worthwhile to use the MBT process over other models, such as LBD
+
+
+run the chains, compare likelihoods (best likelihood) and rf distances
+
+AIC to compare -- and robinson foulds
+
+
+plan a time for a meeting in two weeks. can be before 9:30 -- late afternoon early evening -- eg 6pm here.
+
+ 
+
+in theorem four, explain the relation between the kroncker product and the branching- can just expand elementwise -- all the kp means is just indep of branching processes
+
+ 
+
+start drafting discussion session -- summarise for myself what ive done.
+
+ 
+
+feel free to meet with sophie alone.
