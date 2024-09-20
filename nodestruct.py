@@ -1,4 +1,5 @@
 from num2words import num2words
+from scipy.linalg import expm
 BASES = ["A","C", "G", "T"]
 UNCHANGED = 0
 CHANGED = 1 
@@ -15,6 +16,7 @@ class node:
     self.prior = None
     self.gval = None
     self.changed = CHANGED
+    self.Qt = None
 
   def __str__(self, level=0):
     #ret = "\t"*level+"time: " + repr(self.time)+' / '+repr(self.seq)+"\n" # original
@@ -62,7 +64,7 @@ class node:
   def is_neg(self):
     if self == None:
       return False
-    if self.time <= 0 or (self.right != None and self.right.is_neg()) or (self.left != None and self.left.is_neg()):
+    if self.time < 0 or (self.right != None and self.right.is_neg()) or (self.left != None and self.left.is_neg()): #note change
       return True
       
   def isLeaf(self):
@@ -93,19 +95,20 @@ class node:
       if self.left != None: ret += self.left.associative_mark()
       self.changed = max(-1, ret)
       return self.changed
-	 
+     
   def mark_tree(self):
     self.changed = True
     if self.right != None: self.right.mark_tree()
     if self.left != None: self.left.mark_tree()
 
-  def scale_tree(self, delta):
+  def scale_tree(self, delta, scale, Q):
     self.time *= delta
     self.changed = True
+    self.Qt = expm(Q*self.time*scale)
     if self.right != None:
-      self.right.scale_tree(delta)
+      self.right.scale_tree(delta, scale, Q)
     if self.left != None:
-      self.left.scale_tree(delta)
+      self.left.scale_tree(delta, scale, Q)
 
   def alter_leaves(self, scale):
     if self.isLeaf():
@@ -257,7 +260,7 @@ class node:
     return parents
    
 
-	
+    
   def find_leaf_dists(self):
     dists = []
     leaves = self.find_leaves()

@@ -62,7 +62,7 @@ def bd_lik(tree, lambda0, mu0, log=True, adj = True):
   return val
   
 def lin_bd_lik(B, d, tree):
-  lambda0 = np.average(B)
+  lambda0 = np.average(B.astype(object).reshape(2,4)@np.ones(4))
   mu0 = np.average(d)
   leaves, parents = find_levels(tree)
 

@@ -190,13 +190,16 @@ def sim_tree(alpha, D0, d, B, Q1, Pi, time, min_leaves = 2, seq_len = 1, debug =
 	t2.head.prune_tree()
 	t2.head = clean_tree(t2.head)
 	max_leaves = int(1.3*min_leaves)
+	counter = 0
 	while t2.head.right == None or t2.head.left == None or len(t2.head.find_leaves()) < min_leaves or len(t2.head.find_leaves()) > max_leaves:
 		t2.head = sim_MBT(alpha, D0, np.array(d), B, t2.head, 0, time)
 		t2.head.prune_tree()
 		t2.head = clean_tree(t2.head)
+		counter+=1
+	print("Trees rejected: ", counter)
 
 
-	t2.head.time = 1
+	t2.head.time = 0 # note here
 	t2.obs_time = t2.head.find_max_dist()
 	t2.scale_time = 0.5/t2.obs_time
 	#t2.head.scale_tree(0.5/t2.obs_time)
@@ -207,6 +210,8 @@ def sim_tree(alpha, D0, d, B, Q1, Pi, time, min_leaves = 2, seq_len = 1, debug =
     
 	# need to grow all leaves to max leaf dist.
 	t2.head.alter_leaves(t2.obs_time)
+	t2.Q = Q1
+	t2.head.scale_tree(1, t2.scale_time, t2.Q)
 	return t2
 
 
@@ -218,7 +223,7 @@ def target(s, N, t, Q1, alpha, d, D0, B, Pi, pos, multip, tstamp):
 	#for f in files:
 	#	os.remove(f)
 	with open(currentdir + '/csv/logr.txt', "w+", encoding="utf-8") as f:
-		successes, chaina, chainb, chainc, chaind = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos, send_tree=False, multip=multip, tstamp = tstamp)
+		successes, chaina, chainb, chainc, chaind = run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=f, pos=pos, send_tree=True, multip=multip, tstamp = tstamp)
 
 	print("acceptance rate", successes/len(chaina))
 	with open(currentdir + f"/csv/{tstamp}_a.csv", 'w+', newline = '') as csvfile:

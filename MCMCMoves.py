@@ -2,6 +2,7 @@ import numpy as np
 from copy import deepcopy as dcpy
 from treestruct import *
 from posterior import *
+from scipy.linalg import expm
 from tqdm import tqdm
 """# MCMC"""
 import csv
@@ -20,10 +21,10 @@ debug = 0
 BETA = 1.2 # from paper [2]
 theta = 1
 theta = 1/theta
-WINDOW_ALPHA = 0.1
-WINDOW_D0 = 0.1
-WINDOW_B = 0.1
-WINDOW_MU = 0.1
+WINDOW_ALPHA = 0.2
+WINDOW_D0 = 0.2
+WINDOW_B = 0.2
+WINDOW_MU = 0.2
 TOLER = 0.01
 
 def find_node_n(cur, call, pick_node):
@@ -317,11 +318,14 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
         return EXIT_FAILURE
 
     elif randnum == 2:
+      #b = [B_cpy.reshape(-1)[0], B_cpy.reshape(-1)[-1]]
       b = B_cpy.reshape(-1)
       b = alter_rates(WINDOW_B, b)
       if type(b) == type(EXIT_FAILURE)and b == EXIT_FAILURE:
         return EXIT_FAILURE
-      B_cpy = b.reshape(2,4).astype(object)
+      #lambda_a = [b[0], 0, 0, 0, 0, 0, 0, b[1]]
+      lambda_a = b
+      B_cpy = np.array(lambda_a).reshape(2,4).astype(object)
 
     elif randnum == 3:
 
@@ -334,11 +338,16 @@ def propose_move(tree, alpha, d, D0, B, step, move_type=None, debug=False):
     temp = D0_cpy@np.ones(len(B)) + D1_cpy@np.ones(len(B))+d_cpy
     np.testing.assert_allclose(np.array(temp).astype(np.float64), 0, atol=1e-7)
   
-  md_n = tcpy.head.find_max_dist()
+  # this is weird but itll stop mass from getting stuck at the root
+  tcpy.head.time = 0
+  md_n = tcpy.head.find_max_dist() - 0
   
-  if tcpy.head.is_neg() or (md_n > tree.obs_time + TOLER):
+  if tcpy.head.is_neg():
     return EXIT_FAILURE
-  tcpy.head.scale_tree(tree.obs_time/md_n) # try to keep the obs time the same.
+  tcpy.head.Qt = expm(tcpy.Q*tcpy.head.time*tcpy.scale_time)
+  tcpy.head.right.scale_tree((tree.obs_time-tcpy.head.time)/md_n, tcpy.scale_time, tcpy.Q) # try to keep the obs time the sam
+  tcpy.head.left.scale_tree((tree.obs_time-tcpy.head.time)/md_n, tcpy.scale_time, tcpy.Q)
+  
   return tcpy, Q, alpha_cpy, d_cpy, D0_cpy, B_cpy, move_type
   
 from decimal import *
@@ -416,7 +425,7 @@ def run_chain(s, N, t, Q1, alpha, d, D0, B, Pi, by='io', fname=None, pos = 1, se
     chain1b.append(p1)
     chain1c.append((dcpy(alpha), dcpy(d), dcpy(D0), dcpy(B)))
     chain1d.append(lbd_post)
-    if i % 9900== 0:
+    if i % int((N-10)/2)== 0:
       with open(currentdir + f"/csv/{tstamp}_a.csv", 'w+', newline = '') as csvfile:
         my_writer = csv.writer(csvfile, delimiter = 'Y')
         my_writer.writerow(chain1a)

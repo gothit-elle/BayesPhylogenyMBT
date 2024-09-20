@@ -16,9 +16,9 @@ sys.path.insert(0, parentdir)
 
 if __name__ == '__main__':
 
-	stopping_time = 15
+	stopping_time = 10
 	alpha = np.array([0.7,0.3]).astype(object)
-	lambda_a = np.array([1, 0,0,0,0,0,0,0.1]).astype(object)
+	lambda_a = np.array([1, 0.1,0.1,0.1,0.1,0.1,0.1,0.2]).astype(object)
 	d, D0, D1, B = build_mtrx(mu0= 0.3, mu1= 0.1, q01 = 0.9, q10 =0.1, lambda_a = lambda_a)
 	
 	# we start a tree
@@ -33,7 +33,8 @@ if __name__ == '__main__':
 	Q1 = R@np.diag(Pi)
 	# need to adjust so rows sum to 0
 	Q1 -= np.diag(Q1@np.ones(4))
-	
+	print(Q1)
+	print(Pi@Q1)
 	trees = []
 	
 	random.seed(26111994)
@@ -58,11 +59,11 @@ if __name__ == '__main__':
 	print("starting MCMC chains...")
 	t1 #, t2, t3 = trees
 	multiprocessing.freeze_support()
-	N = 30000
+	N = 50000
 	t = t1.obs_time
 	print(t)
 	# t1.disp()
-	str1 = t1.toStr()
+	str1 = t1 #.toStr()
 	
 	#str2 = t2.toStr()
 	#str3 = t3.toStr()

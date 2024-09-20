@@ -10,6 +10,7 @@ class Tree:
     self.seq_len = seq_len
     self.obs_time = None
     self.scale_time = 1
+    self.Q = None
 
   def disp(self, log=False, fname=None):
     print(self.head, file = fname)
@@ -40,12 +41,12 @@ class Tree:
           # print("case b")
           leaves[i].time += val
           leaves[i].changed = True
-        else: # damn how did this happen? need to rescale the entire tree.
+        else: # damn how did this happen? need to rescale the entire tre
           max_dist = self.head.find_max_dist()
           self.head.alter_leaves(max_dist) # grow the leaves
-          scale_factor = self.obs_time/max_dist
-          self.head.scale_tree(scale_factor)
-          dists = self.head.find_leaf_dists() # update dists
+          #scale_factor = self.obs_time/max_dist
+          #self.head.scale_tree(scale_factor) # no need bc done later
+          #dists = self.head.find_leaf_dists() # update dists
           # print("dists updated", dists)
 
   def fix_tree(self):
