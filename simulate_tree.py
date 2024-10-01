@@ -33,8 +33,6 @@ if __name__ == '__main__':
 	Q1 = R@np.diag(Pi)
 	# need to adjust so rows sum to 0
 	Q1 -= np.diag(Q1@np.ones(4))
-	print(Q1)
-	print(Pi@Q1)
 	trees = []
 	
 	random.seed(26111994)
@@ -59,7 +57,7 @@ if __name__ == '__main__':
 	print("starting MCMC chains...")
 	t1 #, t2, t3 = trees
 	multiprocessing.freeze_support()
-	N = 50000
+	N = 20000
 	t = t1.obs_time
 	print(t)
 	# t1.disp()

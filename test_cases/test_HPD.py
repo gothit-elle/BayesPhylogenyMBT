@@ -26,6 +26,7 @@ from phylotreelib import *
 from kendall_colijn import *
 from prior import *
 from scipy.linalg import expm
+from scipy.linalg import eig
 
 TOLER = 5
 BURNIN = 5000
@@ -263,8 +264,10 @@ def MTPS(time, alpha, d, D0, B, x, adjust=False):
 	prod = np.transpose(np.kron(np.ones(N),np.identity(N)) + np.kron(np.identity(N),np.ones(N))) # this transpose is once again sus
 
 	omega = D0.reshape(2,2) + B.reshape(2,4)@(prod)
-	print("omega is", omega)
+	print("\tomega is", omega)
 
+	val, vec = eig(omega.astype(np.float64))
+	print("\tPF Eigen value is ", val, "\n")
 	return [alpha@expm(omega*t)@np.ones(N) for t in times]
 		
 
@@ -298,8 +301,7 @@ def MTPS_LBD(time, alpha, d, D0, B, x, adjust=False):
 	prod = 2 
 
 	omega = D0+ B*(prod)
-	print("omega is", omega)
-
+	print("\tomega is", omega)
 	return [np.exp(omega*t) for t in times]
 	
 
@@ -323,6 +325,7 @@ def plot_stats(init_tree, mlt_str, lbdt_str, mcc_tree, chaina, ind_mle, ind_lbd,
 	"""
 	# mccpc = find_pop_curve(mcc_tree, by='TR') # this tree has no branch lengths
 	# mcc_tree.disp()
+	"""
 	def rf_dist(t, t2, name): 
 		ret = t.robinson_foulds(t2)
 		rf, max_rf = ret[0:2]
@@ -332,13 +335,13 @@ def plot_stats(init_tree, mlt_str, lbdt_str, mcc_tree, chaina, ind_mle, ind_lbd,
 	rf_totals_lbd.append(rf_dist(t, t3, "LBD Tree"))
 	rf_totals_mcc.append(rf_dist(t, t4, "MCC Tree"))
 	
-	
+	"""
 	
 	leaves = init_tree.head.find_leaves()
 	seqlen = len(leaves[0].seq)
 	
 	print(f"\tTree has {len(leaves)} leaves and a seqlen of {seqlen}")
-
+	
 	"""
 	pool = Pool()
 	results = pool.starmap(plot_arr, zip([alpha, d, D0, B], repeat(i), ["alpha", "d", "D0", "B"])) 
@@ -380,8 +383,9 @@ def plot_stats(init_tree, mlt_str, lbdt_str, mcc_tree, chaina, ind_mle, ind_lbd,
 	plt.legend()
 	plt.savefig(f"../thesis_likelihood/plots/meanpop_{i}.png", bbox_inches='tight')
 	plt.clf()
+	
 	"""
-
+	"""
 	params = {'mathtext.default': 'regular' }
 	plt.rcParams.update(params)
 	plt.xlabel('t')
@@ -406,7 +410,7 @@ def plot_stats(init_tree, mlt_str, lbdt_str, mcc_tree, chaina, ind_mle, ind_lbd,
 	plt.legend()
 	plt.savefig(f"../thesis_likelihood/plots/extinction_theoretical_{i}.png", bbox_inches='tight')
 	plt.clf()
-
+	"""
 	return rf_totals_map, rf_totals_lbd, rf_totals_mcc
 
 def format_str(str):
@@ -509,9 +513,10 @@ if __name__ == '__main__':
 			lbd_tree = Tree(1)
 			lbd_tree.str2tree(chaina[BURNIN:][ind_lbd],20,by='nw')
 			lbd_tree.obs_time = lbd_tree.head.find_max_dist()
-			
+			"""
 			kc_map.append(kc_dist(init_tree, ml_tree))
 			kc_lbd.append(kc_dist(init_tree, lbd_tree))
+			"""
 			# print(mcc_tree.obs_time, lbd_tree.obs_time)
 			# t2.convert_to_ultrametric()
 
@@ -519,10 +524,12 @@ if __name__ == '__main__':
 			if init_tree.obs_time + TOLER <  ml_tree.obs_time or init_tree.obs_time - TOLER > ml_tree.obs_time:
 				print("\t FALSE ", init_tree.obs_time, ml_tree.obs_time )
 			else:
+				
 				print("\t TRUE ", init_tree.obs_time, ml_tree.obs_time )
 				alpha, d, D0, B = calc_param_means(chainc) # remove burn in
 				N = len(chainc[BURNIN:]) 
 				# find_MBT_stats(chainb, i)
+				"""
 				print("\tinit alpha: ", alpha[0])
 				print("\tinit d: ", d[0])
 				print("\tinit D0: ", D0[0])
@@ -534,10 +541,11 @@ if __name__ == '__main__':
 				print("\t ml alpha: ", alpha[BURNIN:][ind])
 				print("\t ml d: ", d[BURNIN:][ind])
 				print("\t ml D0: ", D0[BURNIN:][ind])
-				print("\t ml B: ", B[BURNIN:][ind])
+				print("\t ml B: ", B[BURNIN:][ind])"""
 				rf_totals_map, rf_totals_lbd, rf_totals_mcc = plot_stats(init_tree, chaina[BURNIN:][ind], s_lbd, mcc_tree, chaina, ind, ind_lbd, rf_totals_map, rf_totals_lbd, rf_totals_mcc, alpha, d, D0, B)
 				# rf_lbd = MLE_lbd(chaina[BURNIN:], chainb[BURNIN:], chainc[BURNIN:], alpha, d, D0, B, rf_lbd)
-				
+	
+	"""
 	data = {"MBT": rf_totals_map, "LBD": rf_totals_lbd, "MCC":rf_totals_mcc}
 	plotfig(pd.DataFrame(data), "normalised rf distance", "normalised RF distance", clear=True)
 	data2 = {"MBT": kc_map, "LBD": kc_lbd}
@@ -547,7 +555,7 @@ if __name__ == '__main__':
 	plotfig(pd.DataFrame(data), "normalised rf distance difference", "normalised RF distance difference between the MBT and LBD", clear=True)
 	data2 = {"MBT - LBD dist": [i-j for i,j in zip(kc_map, kc_lbd)]}
 	plotfig(pd.DataFrame(data2), "Kendall-Colijn Distance difference", "Kendall-Colijn Distance difference between the MBT and LBD", clear=True)
-	print("final data len was ", len(rf_totals_map))
+	print("final data len was ", len(rf_totals_map))"""
 	#plotfig(np.array(rf_lbd), "normalised rf distance with LBD prior", clear=True)
 	#print("sample size = ", len(rf_totals))
 

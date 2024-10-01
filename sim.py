@@ -111,7 +111,8 @@ def sim_MBT(alpha, D0, d, B, cur, time, stopping_time):
 	cur.time = float(cur.time)
 	if time + t> stopping_time: # force stop
 		# print("reached obs time", time, t)
-		cur.time = stopping_time - time
+		cur.time -= t
+		cur.time += stopping_time - time
 		return cur
 
 	# the branch keeps living until it dies. so we dont care about length
@@ -200,7 +201,7 @@ def sim_tree(alpha, D0, d, B, Q1, Pi, time, min_leaves = 2, seq_len = 1, debug =
 
 
 	t2.head.time = 0 # note here
-	t2.obs_time = t2.head.find_max_dist()
+	t2.obs_time = time
 	t2.scale_time = 0.5/t2.obs_time
 	#t2.head.scale_tree(0.5/t2.obs_time)
 	#t2.obs_time = 0.5
