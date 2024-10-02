@@ -25,12 +25,12 @@ import phylotreelib as pt
 from phylotreelib import *
 from kendall_colijn import *
 from prior import *
-from scipy.linalg import expm
-from scipy.linalg import eig
+from scipy.linalg import expm, eig
+from scipy.sparse.linalg import eigs
 
 TOLER = 5
 BURNIN = 5000
-look_in = gparentdir + "/thesis_likelihood_csv_files/csv/"
+look_in = gparentdir + "/thesis_likelihood_csv_files/csv_nofixd_brate_root0/"
 LIMIT = 30
 STEPS = 100
 #look_in = parentdir + "/csv/"
@@ -219,14 +219,16 @@ colours = ["#F72585", "#7209B7", "#3A0CA3", "#4361EE", "#4CC9F0", "#47C9F0"]
 #palette = cycle(colours)
 
 # p1 = sns.displot(data=df, x='x1', kind='hist', bins=40, stat='density')
-def plotfig(x1, name, pname, clear=False, f = f, ptype = sns.boxplot, fit=stats.norm):
+def plotfig(x1, name, pname, clear=False, hl=False, f = f, ptype = sns.boxplot, fit=stats.norm):
 	ax = ptype(x1) #,stat='count',  binwidth=0.05,
-	params=fit.fit(x1)
+	#params=fit.fit(x1)
 	#print(params)
 	#xx = np.linspace(*ax.get_xlim(),100)
 	#ax.plot(f(xx), f(fit.pdf(xx, *params)), color = next(palette) )
 	
 	if clear: 
+		if hl: 
+			ax.axhline(hl, 0,1, color='r')
 		ax.set_title(f"{pname} boxplot")
 		ax.figure.savefig(parentdir + f"/plots/{name}.png", bbox_inches='tight')
 		ax.figure.clf()
@@ -247,7 +249,7 @@ def TTE(alpha, d, D0, B, x, adjust=False):
 		gval = G_bkxk(1,x-1, alpha, d, D0.reshape(2,2), B.reshape(2,4))
 		alpha = alpha@gval
 	res = get_E(LIMIT, alpha, d, D0.reshape(2,2), B.reshape(2,4), plot=1).y
-	return alpha@res
+	return alpha@res, (alpha@res)[-1]
 
 
 def MTPS(time, alpha, d, D0, B, x, adjust=False):
@@ -262,13 +264,14 @@ def MTPS(time, alpha, d, D0, B, x, adjust=False):
 	times = np.linspace(0,time)
 	N = len(B.reshape(2,4))
 	prod = np.transpose(np.kron(np.ones(N),np.identity(N)) + np.kron(np.identity(N),np.ones(N))) # this transpose is once again sus
-
 	omega = D0.reshape(2,2) + B.reshape(2,4)@(prod)
-	print("\tomega is", omega)
 
 	val, vec = eig(omega.astype(np.float64))
+	print(val)
+	val = np.linalg.norm(max(val))
+
 	print("\tPF Eigen value is ", val, "\n")
-	return [alpha@expm(omega*t)@np.ones(N) for t in times]
+	return [alpha@expm(omega*t)@np.ones(N) for t in times], val
 		
 
 	
@@ -284,7 +287,7 @@ def TTE_LBD(alpha, d, D0, B, x, adjust=False):
 	def elbd(lambda0, mu0, t):
 		return 1-(lambda0-mu0)/(lambda0-mu0*np.exp(-(lambda0-mu0)*t))
 	res = [elbd(lambda0, mu0, t) for t in times]
-	return res
+	return res, res[-1]
 
 
 def MTPS_LBD(time, alpha, d, D0, B, x, adjust=False):
@@ -301,11 +304,11 @@ def MTPS_LBD(time, alpha, d, D0, B, x, adjust=False):
 	prod = 2 
 
 	omega = D0+ B*(prod)
-	print("\tomega is", omega)
-	return [np.exp(omega*t) for t in times]
+	print("\tomega is", np.linalg.norm(omega))
+	return [np.exp(omega*t) for t in times], omega
 	
 
-def plot_stats(init_tree, mlt_str, lbdt_str, mcc_tree, chaina, ind_mle, ind_lbd, rf_totals_map, rf_totals_lbd, rf_totals_mcc, alpha, d, D0, B):
+def plot_stats(init_tree, mlt_str, lbdt_str, mcc_tree, chaina, ind_mle, ind_lbd, rf_totals_map, rf_totals_lbd, rf_totals_mcc, gMBT, gLBD, gT,  E_MBT, E_LBD, E_T, alpha, d, D0, B):
 	# print("\t True ", init_tree.obs_time, ml_tree.obs_time )
 	s_start = init_tree.head.to_newick()
 	t = Tree_n(s_start, format = 3)
@@ -355,15 +358,22 @@ def plot_stats(init_tree, mlt_str, lbdt_str, mcc_tree, chaina, ind_mle, ind_lbd,
 	mean_pops = sum(results)/len(results)
 	"""
 	
-	mean_total_pop_true = MTPS(init_tree.obs_time, alpha[0],  d[0], D0[0], B[0], init_tree.obs_time)
-	extinction_time_true = TTE(alpha[0], d[0], D0[0], B[0], init_tree.obs_time)
+	mean_total_pop_true, growthTrue = MTPS(init_tree.obs_time, alpha[0],  d[0], D0[0], B[0], init_tree.obs_time)
+	extinction_time_true, ExTrue = TTE(alpha[0], d[0], D0[0], B[0], init_tree.obs_time)
 	
-	mean_total_pop_MAP = MTPS(init_tree.obs_time, alpha[BURNIN:][ind_mle], d[BURNIN:][ind_mle], D0[BURNIN:][ind_mle], B[BURNIN:][ind_mle], init_tree.obs_time)
-	extinction_time_MAP = TTE(alpha[BURNIN:][ind_mle], d[BURNIN:][ind_mle], D0[BURNIN:][ind_mle], B[BURNIN:][ind_mle], init_tree.obs_time)
+	mean_total_pop_MAP, growthMBT = MTPS(init_tree.obs_time, alpha[BURNIN:][ind_mle], d[BURNIN:][ind_mle], D0[BURNIN:][ind_mle], B[BURNIN:][ind_mle], init_tree.obs_time)
+	extinction_time_MAP, ExMBT = TTE(alpha[BURNIN:][ind_mle], d[BURNIN:][ind_mle], D0[BURNIN:][ind_mle], B[BURNIN:][ind_mle], init_tree.obs_time)
 	
-	mean_total_pop_LBD = MTPS_LBD(init_tree.obs_time, alpha[BURNIN:][ind_lbd], d[BURNIN:][ind_lbd], D0[BURNIN:][ind_lbd], B[BURNIN:][ind_lbd], init_tree.obs_time, adjust=False)
-	extinction_time_LBD = TTE_LBD(alpha[BURNIN:][ind_lbd], d[BURNIN:][ind_lbd], D0[BURNIN:][ind_lbd], B[BURNIN:][ind_lbd], init_tree.obs_time, adjust=False)
-		
+	mean_total_pop_LBD, growthLBD = MTPS_LBD(init_tree.obs_time, alpha[BURNIN:][ind_lbd], d[BURNIN:][ind_lbd], D0[BURNIN:][ind_lbd], B[BURNIN:][ind_lbd], init_tree.obs_time, adjust=False)
+	extinction_time_LBD, ExLBD = TTE_LBD(alpha[BURNIN:][ind_lbd], d[BURNIN:][ind_lbd], D0[BURNIN:][ind_lbd], B[BURNIN:][ind_lbd], init_tree.obs_time, adjust=False)
+	
+	if (ExMBT <= 1 and ExLBD <= 1):
+		gMBT.append(growthMBT)
+		gLBD.append(growthLBD)
+		gT.append(growthTrue) 
+		E_MBT.append(ExMBT)
+		E_LBD.append(ExLBD)
+		E_T.append(ExTrue) 
 	#mean_total_pop_LBD = MTPS(alpha[BURNIN:][ind_LBD], D0[BURNIN:][ind_LBD], B[BURNIN:][ind_LBD].reshape(2,4))
 	#extinction_time_LBD = TTE(alpha[BURNIN:][ind_LBD], d[BURNIN:][ind_LBD], D0[BURNIN:][ind_LBD], B[BURNIN:][ind_LBD].reshape(2,4))
 	
@@ -411,7 +421,7 @@ def plot_stats(init_tree, mlt_str, lbdt_str, mcc_tree, chaina, ind_mle, ind_lbd,
 	plt.savefig(f"../thesis_likelihood/plots/extinction_theoretical_{i}.png", bbox_inches='tight')
 	plt.clf()
 	"""
-	return rf_totals_map, rf_totals_lbd, rf_totals_mcc
+	return rf_totals_map, rf_totals_lbd, rf_totals_mcc, gMBT, gLBD, gT, E_MBT, E_LBD, E_T
 
 def format_str(str):
 	str = str.replace("None", '')
@@ -431,8 +441,14 @@ if __name__ == '__main__':
 	rf_totals_map = []
 	rf_totals_lbd = []
 	rf_totals_mcc = []
+	gMBT = []
+	gLBD = [] 
+	gT = []
 	kc_map = []
 	kc_lbd = []
+	E_MBT = []
+	E_LBD = []
+	E_T = []
 	# Iterate directory
 
 	for path in os.listdir(look_in):
@@ -542,8 +558,16 @@ if __name__ == '__main__':
 				print("\t ml d: ", d[BURNIN:][ind])
 				print("\t ml D0: ", D0[BURNIN:][ind])
 				print("\t ml B: ", B[BURNIN:][ind])"""
-				rf_totals_map, rf_totals_lbd, rf_totals_mcc = plot_stats(init_tree, chaina[BURNIN:][ind], s_lbd, mcc_tree, chaina, ind, ind_lbd, rf_totals_map, rf_totals_lbd, rf_totals_mcc, alpha, d, D0, B)
+				rf_totals_map, rf_totals_lbd, rf_totals_mcc, gMBT, gLBD, gT, E_MBT, E_LBD, E_T = plot_stats(init_tree, chaina[BURNIN:][ind], s_lbd, mcc_tree, chaina, ind, ind_lbd, rf_totals_map, rf_totals_lbd, rf_totals_mcc,gMBT, gLBD, gT, E_MBT, E_LBD, E_T, alpha, d, D0, B)
 				# rf_lbd = MLE_lbd(chaina[BURNIN:], chainb[BURNIN:], chainc[BURNIN:], alpha, d, D0, B, rf_lbd)
+	
+	
+
+	data2 = {"MBT": gMBT, "LBD": gLBD}
+	plotfig(pd.DataFrame(data2), "Growth Rate", "Growth Rate", clear=True, hl=gT[0])
+	data2 = {"MBT": E_MBT, "LBD": E_LBD}
+	plotfig(pd.DataFrame(data2), " Ultimate Probability of Extinction", " Ultimate Probability of Extinction", clear=True, hl=E_T[0])
+	
 	
 	"""
 	data = {"MBT": rf_totals_map, "LBD": rf_totals_lbd, "MCC":rf_totals_mcc}

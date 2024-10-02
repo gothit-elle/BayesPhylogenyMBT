@@ -6,3 +6,5 @@ logs/log3.txt
 logs/log4.txt
 *.json
 *.pyc
+*.pyc
+*.png
